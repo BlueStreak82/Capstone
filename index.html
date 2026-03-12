@@ -1,13 +1,184 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="js/script.js" defer></script>
-  <title>Academic Performance Tracker</title>
-</head>
-<body>
-  
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="js/script.js" defer></script>
+    <title>Academic Performance Tracker</title>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-title">Academic Tracker</div>
+      <div
+        id="theme-toggle"
+        role="button"
+        tabindex="0"
+        aria-label="Toggle theme"
+      >
+        <ion-icon name="moon-outline"></ion-icon>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <h1>Track Your Academic Success</h1>
+        <p>
+          Calculate your CWA/GPA instantly, gain performance insights, and track
+          your study progress with our comprehensive academic tracking platform
+          for students.
+        </p>
+
+        <div class="hero-btns">
+          <button class="btn-primary">
+            Get Started <ion-icon name="arrow-forward-outline"></ion-icon>
+          </button>
+          <button class="btn-secondary">Login</button>
+        </div>
+      </section>
+
+      <section class="features">
+        <div class="features-header">
+          <h2>Powerful Features for Students</h2>
+        </div>
+
+        <div class="cards-container">
+          <div class="cards">
+            <!-- Card 1 -->
+            <div class="card1">
+              <div class="calc-bg">
+                <ion-icon
+                  name="calculator-outline"
+                  class="calc-icon"
+                ></ion-icon>
+              </div>
+              <h3>CWA/GPA Calculator</h3>
+              <p>
+                Quickly calculate and interpret your Cumulative Weighted Average
+                or GPA without manual computation
+              </p>
+              <ul class="feature-list">
+                <li>
+                  <ion-icon
+                    name="checkmark-circle-outline"
+                    class="check-icon"
+                  ></ion-icon
+                  >Instant GPA calculation
+                </li>
+                <li>
+                  <ion-icon
+                    name="checkmark-circle-outline"
+                    class="check-icon"
+                  ></ion-icon
+                  >Multiple grading systems
+                </li>
+                <li>
+                  <ion-icon
+                    name="checkmark-circle-outline"
+                    class="check-icon"
+                  ></ion-icon
+                  >Save calculations history
+                </li>
+              </ul>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card2">
+              <div class="analytics-bg">
+                <ion-icon
+                  name="analytics-outline"
+                  class="analytics-icon"
+                ></ion-icon>
+              </div>
+              <h3>Performance Insight Engine</h3>
+              <p>
+                Link academic results to actionable study plans and identify
+                opportunities for improvement
+              </p>
+              <ul class="feature-list">
+                <li>
+                  <ion-icon
+                    name="checkmark-circle-outline"
+                    class="check-icon"
+                  ></ion-icon
+                  >Visual performance charts
+                </li>
+                <li>
+                  <ion-icon
+                    name="checkmark-circle-outline"
+                    class="check-icon"
+                  ></ion-icon
+                  >Identify weak subjects
+                </li>
+                <li>
+                  <ion-icon
+                    name="checkmark-circle-outline"
+                    class="check-icon"
+                  ></ion-icon
+                  >Track progress over time
+                </li>
+              </ul>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card3">
+              <div class="book-bg">
+                <ion-icon name="book-outline" class="book-icon"></ion-icon>
+              </div>
+              <h3>Study Tracker</h3>
+              <p>
+                Structured tracking for course-related reading and study
+                activities to improve performance
+              </p>
+              <ul class="feature-list">
+                <li>
+                  <ion-icon
+                    name="checkmark-circle-outline"
+                    class="check-icon"
+                  ></ion-icon
+                  >Track reading materials
+                </li>
+                <li>
+                  <ion-icon
+                    name="checkmark-circle-outline"
+                    class="check-icon"
+                  ></ion-icon
+                  >Set study goals
+                </li>
+                <li>
+                  <ion-icon
+                    name="checkmark-circle-outline"
+                    class="check-icon"
+                  ></ion-icon
+                  >Monitor study hours
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="hero">
+        <h1>Ready to Improve Your Academic Performance?</h1>
+        <p>
+          Join thousands of students who are already tracking and improving
+          their academic success
+        </p>
+
+        <div class="hero-btns">
+          <button class="btn-primary start-btn">
+            Start Free Today <ion-icon name="arrow-forward-outline"></ion-icon>
+          </button>
+        </div>
+      </section>
+    </main>
+  </body>
 </html>
