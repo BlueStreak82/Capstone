@@ -18,6 +18,11 @@
   <body>
     <nav class="nav">
       <div class="nav-title">Academic Tracker</div>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+        <a href="signup.html">Sign Up</a>
+      </div>
       <div
         id="theme-toggle"
         role="button"
@@ -38,10 +43,19 @@
         </p>
 
         <div class="hero-btns">
-          <button class="btn-primary">
+          <a
+            href="signup.html"
+            class="btn-primary"
+            style="display: inline-flex; align-items: center; gap: 8px"
+          >
             Get Started <ion-icon name="arrow-forward-outline"></ion-icon>
-          </button>
-          <button class="btn-secondary">Login</button>
+          </a>
+          <a
+            href="login.html"
+            class="btn-secondary"
+            style="display: inline-block"
+            >Login</a
+          >
         </div>
       </section>
 
@@ -174,9 +188,13 @@
         </p>
 
         <div class="hero-btns">
-          <button class="btn-primary start-btn">
+          <a
+            href="signup.html"
+            class="btn-primary start-btn"
+            style="display: inline-flex; align-items: center; gap: 8px"
+          >
             Start Free Today <ion-icon name="arrow-forward-outline"></ion-icon>
-          </button>
+          </a>
         </div>
       </section>
     </main>

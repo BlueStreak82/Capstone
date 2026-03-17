@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="js/script.js" defer></script>
+    <title>Sign Up - Academic Performance Tracker</title>
+    <style>
+      .signup-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .signup-card {
+        width: 100%;
+        max-width: 400px;
+        background: var(--bg-secondary);
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: var(--shadow-medium);
+      }
+
+      .signup-card h1 {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 28px;
+      }
+
+      .signup-card p {
+        text-align: center;
+        color: var(--text-secondary);
+        margin-bottom: 30px;
+        font-size: 14px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 14px;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        transition: border-color 0.3s ease;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+      }
+
+      .password-match {
+        font-size: 12px;
+        margin-top: 5px;
+        height: 16px;
+      }
+
+      .signup-button {
+        width: 100%;
+        padding: 12px;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        font-size: 14px;
+      }
+
+      .signup-button:hover {
+        background: var(--accent-hover);
+      }
+
+      .signup-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .error-message {
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        display: none;
+      }
+
+      .error-message.error {
+        background: #fee;
+        color: #c33;
+        border: 1px solid #fcc;
+      }
+
+      .error-message.success {
+        background: #efe;
+        color: #3c3;
+        border: 1px solid #cfc;
+      }
+
+      .login-link {
+        text-align: center;
+        margin-top: 20px;
+        color: var(--text-secondary);
+        font-size: 14px;
+      }
+
+      .login-link a {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .login-link a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 480px) {
+        .signup-card {
+          padding: 30px 20px;
+        }
+
+        .signup-card h1 {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-title">Academic Tracker</div>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+      </div>
+      <div
+        id="theme-toggle"
+        role="button"
+        tabindex="0"
+        aria-label="Toggle theme"
+      >
+        <ion-icon name="moon-outline"></ion-icon>
+      </div>
+    </nav>
+
+    <div class="signup-container">
+      <div class="signup-card">
+        <h1>Create Account</h1>
+        <p>Join thousands of students tracking their success</p>
+
+        <div id="error-message"></div>
+
+        <form id="signup-form">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="John Doe"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="your@email.com"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="At least 6 characters"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="confirm-password">Confirm Password</label>
+            <input
+              type="password"
+              id="confirm-password"
+              name="confirm-password"
+              placeholder="Confirm your password"
+              required
+            />
+            <div id="password-match" class="password-match"></div>
+          </div>
+
+          <button type="submit" class="signup-button">Create Account</button>
+        </form>
+
+        <div class="login-link">
+          Already have an account? <a href="login.html">Sign in</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load services before page handler -->
+    <script src="js/mock-data.js"></script>
+    <script src="js/services/auth.js"></script>
+    <script src="js/services/grades.js"></script>
+    <script src="js/services/study-tracker.js"></script>
+    <script src="js/page-handlers/signup.js"></script>
+  </body>
+</html>
