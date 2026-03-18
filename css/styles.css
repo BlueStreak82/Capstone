@@ -463,10 +463,93 @@ main {
   text-decoration: underline;
 }
 
+/* ==========================================
+   SIGNUP STYLES
+   ========================================== */
+
+.signup-container {
+  min-height: 94vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--bg-primary);
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-secondary);
+  padding: 40px 28px;
+  border-radius: 10px;
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--border-color);
+}
+
+.signup-card h1 {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.signup-card p {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+.password-match {
+  font-size: 12px;
+  margin-top: 5px;
+  height: 16px;
+  color: var(--text-secondary);
+}
+
+.signup-button {
+  width: 100%;
+  padding: 14px;
+  background: var(--bg-button1);
+  color: var(--text-btn);
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  font-size: 14px;
+}
+
+.signup-button:hover {
+  opacity: 0.9;
+}
+
+.signup-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.login-link a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
 @media (min-width: 768px) {
   /* Tablet and up */
   .login-card {
-    max-width: 520px;
+    max-width: 480px;
     padding: 50px 40px;
   }
 
@@ -476,6 +559,21 @@ main {
   }
 
   .login-card p {
+    font-size: 15px;
+    margin-bottom: 40px;
+  }
+
+  .signup-card {
+    max-width: 480px;
+    padding: 50px 40px;
+  }
+
+  .signup-card h1 {
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+
+  .signup-card p {
     font-size: 15px;
     margin-bottom: 40px;
   }
