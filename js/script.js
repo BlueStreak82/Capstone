@@ -44,20 +44,24 @@ class ThemeManager {
         this.applyTheme();
     }
 
-    /**
-     * Apply theme to document
-     */
     applyTheme() {
         const htmlElement = document.documentElement;
+        const themeToggle = document.getElementById('theme-toggle');
+        const icon = document.querySelector('#theme-toggle ion-icon');
 
         if (this.theme === 'dark') {
             htmlElement.setAttribute('data-theme', 'dark');
+            if (icon) icon.setAttribute('name', 'moon-outline');
+            if (themeToggle) themeToggle.setAttribute('aria-pressed', 'true');
         } else {
             htmlElement.removeAttribute('data-theme');
+            if (icon) icon.setAttribute('name', 'sunny-outline');
+            if (themeToggle) themeToggle.setAttribute('aria-pressed', 'false');
         }
 
         localStorage.setItem(this.storageKey, this.theme);
     }
+
 
     /**
      * Toggle between light and dark theme
@@ -102,6 +106,51 @@ class ThemeManager {
         }
     }
 }
+
+// Toggle Menu
+document.addEventListener('DOMContentLoaded', () => {
+  const menuIcon = document.getElementById('mobile-menu-icon');
+  const navLinks = document.getElementById('nav-links');
+  const navBackdrop = document.getElementById('nav-backdrop');
+
+  if (menuIcon && navLinks) {
+    const setMenuState = (isOpen) => {
+      navLinks.classList.toggle('active', isOpen);
+      if (navBackdrop) {
+        navBackdrop.classList.toggle('active', isOpen);
+        navBackdrop.setAttribute('aria-hidden', String(!isOpen));
+      }
+      menuIcon.setAttribute('aria-expanded', String(isOpen));
+    };
+
+    menuIcon.addEventListener('click', () => {
+      const isOpen = !navLinks.classList.contains('active');
+      setMenuState(isOpen);
+    });
+
+    navLinks.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 912) {
+          setMenuState(false);
+        }
+      });
+    });
+
+    if (navBackdrop) {
+      navBackdrop.addEventListener('click', () => {
+        setMenuState(false);
+      });
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 912) {
+        setMenuState(false);
+      }
+    });
+  } else {
+    console.error("Could not find menu-icon or nav-links IDs in the HTML.");
+  }
+});
 
 /**
  * Initialize all modules when DOM is ready
