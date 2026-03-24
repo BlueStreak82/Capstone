@@ -1,10 +1,8 @@
-/**
- * DASHBOARD PAGE HANDLER
- * Manages dashboard display and interactions
- */
-
-// Check authentication on page load
+// =========================
+// DASHBOARD INITIALIZATION
+// =========================
 document.addEventListener("DOMContentLoaded", async () => {
+  try {
   // Verify user is logged in
   if (!authService.isLoggedIn()) {
     console.log("Not logged in, redirecting to login page");
@@ -12,40 +10,32 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // Load dashboard data
-  await loadDashboardData();
+    // LOAD DATA
+    const user = authService.getCurrentUser();
+    const grades = await gradesService.getGrades();
+    const sessions = await studyTrackerService.getSessions();
+    
 
-  // Setup logout button
-  setupLogout();
+    //  DISPLAY
+    displayUser(user);
+    displayStats(grades, sessions);
+
+    //  NAVIGATION
+    setupNavigation();
+// recent activities
+    loadRecentActivities();
+
+  } catch (error) {
+    console.error("Dashboard error:", error);
+    alert("Error loading dashboard");
+  }
 });
 
-/**
- * Load and display dashboard data
- */
-async function loadDashboardData() {
-  try {
-    const user = authService.getCurrentUser();
+// ==========================
+// DISPLAY USER
+// ==========================
 
-    // Display user info
-    displayUserInfo(user);
-
-    // Load grades
-    const grades = await gradesService.getGrades();
-    displayGrades(grades);
-
-    // Load study sessions
-    const sessions = await studyTrackerService.getSessions();
-    displayStudyStats(sessions);
-  } catch (error) {
-    console.error("Error loading dashboard data:", error);
-    showAlert("Error loading dashboard: " + error.message, "error");
-  }
-}
-
-/**
- * Display user information
- */
-function displayUserInfo(user) {
+function displayUser(user) {
   const userNameEl = document.getElementById("user-name");
   const userEmailEl = document.getElementById("user-email");
 
@@ -53,121 +43,29 @@ function displayUserInfo(user) {
   if (userEmailEl) userEmailEl.textContent = user.email;
 }
 
-/**
- * Display grades and GPA
- */
-function displayGrades(courses) {
-  const gradesContainer = document.getElementById("grades-container");
-  const gpaEl = document.getElementById("gpa-value");
-  const avgGradeEl = document.getElementById("avg-grade-value");
-  const coursesCountEl = document.getElementById("courses-count");
 
-  if (!gradesContainer) return;
+// ==========================
+// DISPLAY STATS
+// ==========================
+function displayStats(grades, sessions) {
+  // GPA
+  const gpa = gradesService.calculateGPA(grades);
+  document.getElementById("gpa-value").textContent = gpa;
 
-  // Calculate stats
-  const gpa = gradesService.calculateGPA(courses);
-  const avgGrade = gradesService.calculateAverageGrade(courses);
-
-  // Update stats
-  if (gpaEl) gpaEl.textContent = gpa;
-  if (avgGradeEl) avgGradeEl.textContent = avgGrade;
-  if (coursesCountEl) coursesCountEl.textContent = courses.length;
-
-  // Display course list
-  if (courses.length === 0) {
-    gradesContainer.innerHTML =
-      '<p class="empty-state">No courses added yet. <a href="#add-course">Add your first course</a></p>';
-    return;
-  }
-
-  const coursesList = courses
-    .map(
-      (course) => `
-        <div class="course-card">
-            <div class="course-header">
-                <h3>${course.name}</h3>
-                <span class="grade-badge ${getGradeColor(course.grade)}">${course.grade}</span>
-            </div>
-            <div class="course-details">
-                <p><strong>Semester:</strong> ${course.semester}</p>
-                <p><strong>Credit Hours:</strong> ${course.creditHours}</p>
-            </div>
-        </div>
-    `,
-    )
-    .join("");
-
-  gradesContainer.innerHTML = coursesList;
-}
-
-/**
- * Display study statistics
- */
-function displayStudyStats(sessions) {
-  const totalHoursEl = document.getElementById("total-hours");
-  const sessionsCountEl = document.getElementById("sessions-count");
-  const avgHoursEl = document.getElementById("avg-hours");
-  const streakEl = document.getElementById("study-streak");
-  const recentSessionsEl = document.getElementById("recent-sessions");
-
-  if (sessions.length === 0) {
-    if (totalHoursEl) totalHoursEl.textContent = "0";
-    if (sessionsCountEl) sessionsCountEl.textContent = "0";
-    if (recentSessionsEl) {
-      recentSessionsEl.innerHTML =
-        '<p class="empty-state">No study sessions yet. Start tracking!</p>';
-    }
-    return;
-  }
-
-  // Calculate stats
+  // Study Hours
   const totalHours = studyTrackerService.calculateTotalHours(sessions);
-  const avgHours = studyTrackerService.calculateAverageHours(sessions);
-  const streak = studyTrackerService.calculateStreak(sessions);
-  const mostStudied = studyTrackerService.getMostStudiedCourse(sessions);
+  document.getElementById("total-hours").textContent = totalHours + "h";
 
-  // Update stats
-  if (totalHoursEl) totalHoursEl.textContent = totalHours;
-  if (sessionsCountEl) sessionsCountEl.textContent = sessions.length;
-  if (avgHoursEl) avgHoursEl.textContent = avgHours;
-  if (streakEl) streakEl.textContent = streak + " days";
-
-  // Display recent sessions
-  if (recentSessionsEl) {
-    const recentList = sessions
-      .slice(0, 5)
-      .map(
-        (session) => `
-            <div class="session-item">
-                <div class="session-header">
-                    <h4>${session.courseName}</h4>
-                    <span class="session-hours">${session.hoursSpent}h</span>
-                </div>
-                <p class="session-date">${new Date(session.date).toLocaleDateString()}</p>
-                ${session.notes ? `<p class="session-notes">${session.notes}</p>` : ""}
-            </div>
-        `,
-      )
-      .join("");
-
-    recentSessionsEl.innerHTML = recentList;
-  }
+  // Sessions
+  document.getElementById("sessions-count").textContent =
+    sessions.length + "/10";
 }
 
-/**
- * Get color class based on grade
- */
-function getGradeColor(grade) {
-  if (grade >= 90) return "grade-excellent";
-  if (grade >= 80) return "grade-good";
-  if (grade >= 70) return "grade-fair";
-  return "grade-poor";
-}
-
-/**
- * Setup logout functionality
- */
-function setupLogout() {
+// ==========================
+// NAVIGATION ONLY
+// ==========================
+function setupNavigation() {
+  // Logout
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
     logoutBtn.addEventListener("click", (e) => {
@@ -178,29 +76,70 @@ function setupLogout() {
       }
     });
   }
+
+  // Profile
+  const profileIcon = document.querySelector(".nav-right ion-icon");
+  profileIcon?.addEventListener("click", () => {
+    window.location.href = "profile.html";
+  });
+
+  // Nav links
+  document.querySelectorAll(".nav-links a").forEach(link => {
+    link.addEventListener("click", () => {
+      const text = link.textContent.toLowerCase();
+
+      if (text.includes("dashboard")) return;
+      if (text.includes("calculator")) window.location.href = "calculator.html";
+      if (text.includes("performance")) window.location.href = "performance.html";
+      if (text.includes("study")) window.location.href = "study.html";
+    });
+  });
+
 }
 
-/**
- * Show alert messages
- */
-function showAlert(message, type = "info") {
-  const alert = document.createElement("div");
-  alert.className = `alert alert-${type}`;
-  alert.textContent = message;
-  alert.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        background: ${type === "error" ? "#ff6b6b" : "#51cf66"};
-        color: white;
-        border-radius: 4px;
-        z-index: 1000;
+// ==========================
+// LOAD RECENT ACTIVITIES
+// ==========================
+function loadRecentActivities() {
+  const container = document.querySelector(".activity-list");
+
+  if (!container) return;
+
+  const activities = JSON.parse(localStorage.getItem("activities")) || [];
+
+  if (activities.length === 0) {
+    container.innerHTML = "<p>No recent activity</p>";
+    return;
+  }
+
+  container.innerHTML = "";
+
+  activities.slice(-5).reverse().forEach(act => {
+    const item = document.createElement("div");
+    item.classList.add("activity-item");
+
+    item.innerHTML = `
+      <div class="activity-icon">
+        <ion-icon name="${act.icon || "time-outline"}"></ion-icon>
+      </div>
+      <div>
+        <p>${act.text}</p>
+        <span>${act.time}</span>
+      </div>
     `;
 
-  document.body.appendChild(alert);
+    container.appendChild(item);
+  });
+}
 
-  setTimeout(() => {
-    alert.remove();
-  }, 3000);
+function addActivity(text, icon = "time-outline") {
+  const activities = JSON.parse(localStorage.getItem("activities")) || [];
+
+  activities.push({
+    text,
+    icon,
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("activities", JSON.stringify(activities));
 }
