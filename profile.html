@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/page-handlers/profile.js" defer></script>
+    <title>Profile Settings - Academic Tracker</title>
+  </head>
+  <body class="profile-page">
+    <nav class="nav">
+      <div class="nav-left">
+        <a href="dashboard.html" class="nav-title">Academic Tracker</a>
+
+        <button
+          id="mobile-menu-icon"
+          class="menu-toggle"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-controls="nav-links"
+          aria-expanded="false"
+        >
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="nav-links" id="nav-links">
+        <a href="dashboard.html"
+          ><ion-icon name="grid-outline"></ion-icon> Dashboard</a
+        >
+        <a href="calculator.html"
+          ><ion-icon name="calculator-outline"></ion-icon> Calculator</a
+        >
+        <a href="performance.html"
+          ><ion-icon name="analytics-outline"></ion-icon> Performance</a
+        >
+        <a href="study.html"
+          ><ion-icon name="book-outline"></ion-icon> Study Tracker</a
+        >
+
+        <div class="nav-right">
+          <a href="profile.html" id="profile" aria-current="page">
+            <ion-icon name="person-circle-outline" class="nav-icon"></ion-icon>
+            Profile
+          </a>
+
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle theme"
+            class="nav-icon"
+          >
+            <span class="theme-toggle-content">
+              <ion-icon name="moon-outline"></ion-icon>
+              <span>Theme</span>
+            </span>
+            <span class="theme-slider" aria-hidden="true"></span>
+          </button>
+
+          <a href="#" id="logout-btn" class="logout"
+            ><ion-icon name="log-out-outline"></ion-icon> Logout</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
+
+    <main class="container profile-container">
+      <section class="profile-hero">
+        <h1>Profile Settings</h1>
+        <p>Manage your account settings and preferences</p>
+      </section>
+
+      <section class="profile-section">
+        <article class="profile-card">
+          <div class="profile-card-heading">
+            <h2>Profile Information</h2>
+            <p>Your personal information and account details</p>
+          </div>
+
+          <div class="profile-fields">
+            <div class="profile-field">
+              <label for="profile-name">
+                <ion-icon name="person-outline"></ion-icon>
+                Full Name
+              </label>
+              <div class="profile-field-value" id="profile-name">Student User</div>
+            </div>
+
+            <div class="profile-field">
+              <label for="profile-email">
+                <ion-icon name="mail-outline"></ion-icon>
+                Email Address
+              </label>
+              <div class="profile-field-value" id="profile-email">student@example.com</div>
+            </div>
+
+            <div class="profile-field">
+              <label for="profile-university">
+                <ion-icon name="school-outline"></ion-icon>
+                University
+              </label>
+              <div class="profile-field-value" id="profile-university">KNUST</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="profile-card">
+          <div class="profile-card-heading">
+            <h2>Appearance</h2>
+            <p>Customize the look and feel of the application</p>
+          </div>
+
+          <div class="appearance-row">
+            <div class="appearance-copy">
+              <div class="appearance-title">
+                <ion-icon id="appearance-theme-icon" name="moon-outline"></ion-icon>
+                <div>
+                  <h3>Dark Mode</h3>
+                  <p id="appearance-theme-text">Switch to dark mode</p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              id="appearance-toggle"
+              class="appearance-toggle"
+              type="button"
+              role="switch"
+              aria-label="Toggle dark mode"
+              aria-checked="false"
+            >
+              <span class="appearance-toggle-track"></span>
+              <span class="appearance-toggle-thumb"></span>
+            </button>
+          </div>
+
+          <div class="profile-tip">
+            <span>Tip:</span> Dark mode can reduce eye strain during long study
+            sessions, especially in low-light environments.
+          </div>
+        </article>
+
+        <article class="profile-card">
+          <div class="profile-card-heading">
+            <h2>Academic Statistics</h2>
+            <p>Your academic journey at a glance</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span>Student ID</span>
+              <strong id="student-id">1</strong>
+            </div>
+            <div class="stat-item">
+              <span>Member Since</span>
+              <strong id="member-since">March 2026</strong>
+            </div>
+            <div class="stat-item">
+              <span>Total Courses Tracked</span>
+              <strong id="courses-tracked">0 Courses</strong>
+            </div>
+            <div class="stat-item">
+              <span>GPA Calculations</span>
+              <strong id="gpa-calculations">0 Calculations</strong>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/services/auth.js"></script>
+    <script src="js/services/grades.js"></script>
+    <script src="js/services/study-tracker.js"></script>
+  </body>
+</html>

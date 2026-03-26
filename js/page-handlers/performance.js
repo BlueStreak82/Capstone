@@ -34,7 +34,7 @@ function setupNavigation() {
   if (profileLink) {
     profileLink.addEventListener("click", (event) => {
       event.preventDefault();
-      alert("Profile page is not available yet.");
+      window.location.href = "profile.html";
     });
   }
 }
