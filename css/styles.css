@@ -24,6 +24,24 @@
   --academic-text: #155dfc;
   --hover-bg: #dbeafe;
   --logout-color: #eb5050;
+  --performance-card-soft: #f8fafc;
+  --performance-border: var(--border-color);
+  --performance-grid: rgba(148, 163, 184, 0.26);
+  --performance-blue: var(--accent-color);
+  --performance-purple: #8b5cf6;
+  --performance-green: var(--book-icon);
+  --performance-orange: #f97316;
+  --performance-danger: #ef4444;
+  --performance-text-soft: var(--text-secondary);
+  --performance-shell: #ffffff;
+  --performance-tab-bg: #e9ebf1;
+  --performance-tab-active: #ffffff;
+  --performance-text-xs: clamp(0.92rem, 0.86rem + 0.22vw, 1rem);
+  --performance-text-sm: clamp(1rem, 0.94rem + 0.3vw, 1.12rem);
+  --performance-text-md: clamp(1.12rem, 1.02rem + 0.5vw, 1.3rem);
+  --performance-text-lg: clamp(1.28rem, 1.14rem + 0.8vw, 1.62rem);
+  --performance-text-xl: clamp(2.15rem, 1.7rem + 1.6vw, 3rem);
+  background-color: var(--bg-primary);
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -65,6 +83,13 @@
   --academic-text: #51a2ff;
   --hover-bg: #030712;
   --logout-color: #eb5050;
+  --performance-card-soft: #0e1524;
+  --performance-border: rgba(148, 163, 184, 0.16);
+  --performance-grid: rgba(148, 163, 184, 0.12);
+  --performance-text-soft: #94a3b8;
+  --performance-shell: rgba(2, 6, 23, 0.6);
+  --performance-tab-bg: rgba(148, 163, 184, 0.14);
+  --performance-tab-active: rgba(255, 255, 255, 0.08);
 }
 
 * {
@@ -615,39 +640,6 @@ main {
    PERFORMANCE PAGE
    ========================================== */
 
-.performance-page {
-  --performance-card: var(--bg-secondary);
-  --performance-card-soft: #f8fafc;
-  --performance-border: var(--border-color);
-  --performance-grid: rgba(148, 163, 184, 0.26);
-  --performance-blue: var(--accent-color);
-  --performance-purple: #8b5cf6;
-  --performance-green: var(--book-icon);
-  --performance-orange: #f97316;
-  --performance-danger: #ef4444;
-  --performance-text-soft: var(--text-secondary);
-  --performance-shell: #ffffff;
-  --performance-tab-bg: #e9ebf1;
-  --performance-tab-active: #ffffff;
-  --performance-text-xs: clamp(0.92rem, 0.86rem + 0.22vw, 1rem);
-  --performance-text-sm: clamp(1rem, 0.94rem + 0.3vw, 1.12rem);
-  --performance-text-md: clamp(1.12rem, 1.02rem + 0.5vw, 1.3rem);
-  --performance-text-lg: clamp(1.28rem, 1.14rem + 0.8vw, 1.62rem);
-  --performance-text-xl: clamp(2.15rem, 1.7rem + 1.6vw, 3rem);
-  background-color: var(--bg-primary);
-}
-
-[data-theme="dark"] .performance-page {
-  --performance-card: #0b111f;
-  --performance-card-soft: #0e1524;
-  --performance-border: rgba(148, 163, 184, 0.16);
-  --performance-grid: rgba(148, 163, 184, 0.12);
-  --performance-text-soft: #94a3b8;
-  --performance-shell: rgba(2, 6, 23, 0.6);
-  --performance-tab-bg: rgba(148, 163, 184, 0.14);
-  --performance-tab-active: rgba(255, 255, 255, 0.08);
-}
-
 .performance-page .container {
   width: min(100% - 1.5rem, 75rem);
   margin: 0 auto;
@@ -684,7 +676,7 @@ main {
 .metric-card,
 .chart-card,
 .insight-card {
-  background: var(--performance-card);
+  background: var(--bg-secondary);
   border: 1px solid var(--performance-border);
   border-radius: 1rem;
   box-shadow: var(--shadow-light);
