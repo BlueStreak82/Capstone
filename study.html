@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="js/script.js" defer></script>
+    <title>Study Tracker - Academic Performance Tracker</title>
+  </head>
+  <body class="study-page">
+    <nav class="nav">
+      <div class="nav-left">
+        <a href="dashboard.html" class="nav-title">AcademicTracker</a>
+
+        <button
+          id="mobile-menu-icon"
+          class="menu-toggle"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-controls="nav-links"
+          aria-expanded="false"
+        >
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="nav-links" id="nav-links">
+        <a href="dashboard.html"
+          ><ion-icon name="grid-outline"></ion-icon> Dashboard</a
+        >
+        <a href="calculator.html"
+          ><ion-icon name="calculator-outline"></ion-icon> Calculator</a
+        >
+        <a href="performance.html"
+          ><ion-icon name="analytics-outline"></ion-icon> Performance</a
+        >
+        <a href="study.html" aria-current="page"
+          ><ion-icon name="book-outline"></ion-icon> Study Tracker</a
+        >
+
+        <div class="nav-right">
+          <a href="#" id="profile-link" aria-label="Profile">
+            <ion-icon name="person-outline" class="nav-icon"></ion-icon>
+          </a>
+
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle theme"
+            class="nav-icon"
+          >
+            <span class="theme-toggle-content">
+              <ion-icon name="moon-outline"></ion-icon>
+              <span>Theme</span>
+            </span>
+            <span class="theme-slider" aria-hidden="true"></span>
+          </button>
+
+          <a href="#" id="logout-btn" class="logout"
+            ><ion-icon name="log-out-outline"></ion-icon> Logout</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
+
+    <main class="container study-layout">
+      <section class="study-header">
+        <h1>Study Tracker</h1>
+        <p>Track your reading materials and study sessions</p>
+      </section>
+
+      <section class="study-summary-grid" aria-label="Study summary">
+        <article class="study-summary-card">
+          <p>Total Readings</p>
+          <h2>
+            <ion-icon name="book-outline" class="summary-icon icon-blue"></ion-icon>
+            <span id="stat-total-readings">0</span>
+          </h2>
+        </article>
+
+        <article class="study-summary-card">
+          <p>Completed</p>
+          <h2>
+            <ion-icon
+              name="checkmark-circle-outline"
+              class="summary-icon icon-green"
+            ></ion-icon>
+            <span id="stat-completed">0</span>
+          </h2>
+        </article>
+
+        <article class="study-summary-card">
+          <p>In Progress</p>
+          <h2>
+            <ion-icon name="trending-up-outline" class="summary-icon icon-orange"></ion-icon>
+            <span id="stat-in-progress">0</span>
+          </h2>
+        </article>
+
+        <article class="study-summary-card">
+          <p>Study Hours</p>
+          <h2>
+            <ion-icon name="time-outline" class="summary-icon icon-purple"></ion-icon>
+            <span id="stat-study-hours">0h</span>
+          </h2>
+        </article>
+      </section>
+
+      <section class="study-tabs" aria-label="Study views">
+        <button id="tab-readings" class="study-tab active" type="button">
+          Reading Materials
+        </button>
+        <button id="tab-sessions" class="study-tab" type="button">
+          Study Sessions
+        </button>
+      </section>
+
+      <section id="panel-readings" class="study-panel">
+        <article class="study-card">
+          <div class="study-card-head">
+            <h3>Your Reading List</h3>
+            <button id="add-reading-btn" class="btn-primary" type="button">
+              <ion-icon name="add-outline"></ion-icon>
+              Add Reading
+            </button>
+          </div>
+          <div id="reading-list" class="reading-list"></div>
+        </article>
+      </section>
+
+      <section id="panel-sessions" class="study-panel" hidden>
+        <article class="study-card">
+          <div class="study-card-head">
+            <h3>Recent Study Sessions</h3>
+          </div>
+          <p class="section-subtext">Your study activity over the past week</p>
+          <div id="sessions-list" class="sessions-list"></div>
+        </article>
+      </section>
+
+      <section class="study-goals-card">
+        <h3>Weekly Study Goals</h3>
+        <p class="section-subtext">Track your progress towards weekly targets</p>
+
+        <div class="goal-row">
+          <div class="goal-label">
+            <span>
+              <ion-icon name="time-outline"></ion-icon>
+              Study Hours Goal
+            </span>
+            <span id="goal-hours-value">0 / 40 hours</span>
+          </div>
+          <div class="goal-progress-track">
+            <div id="goal-hours-progress" class="goal-progress-fill"></div>
+          </div>
+        </div>
+
+        <div class="goal-row">
+          <div class="goal-label">
+            <span>
+              <ion-icon name="book-outline"></ion-icon>
+              Readings Completed
+            </span>
+            <span id="goal-readings-value">0 / 5 readings</span>
+          </div>
+          <div class="goal-progress-track">
+            <div id="goal-readings-progress" class="goal-progress-fill"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="add-reading-modal" class="study-modal" hidden>
+      <div class="study-modal-backdrop" data-close-modal></div>
+      <div
+        class="study-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-reading-title"
+      >
+        <div class="study-modal-head">
+          <h3 id="add-reading-title">Add New Reading</h3>
+          <button
+            id="close-reading-modal"
+            class="study-modal-close"
+            type="button"
+            aria-label="Close add reading form"
+          >
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
+        </div>
+
+        <form id="add-reading-form" class="study-modal-form">
+          <div class="study-form-grid">
+            <label class="study-field">
+              <span>Title</span>
+              <input
+                id="reading-title"
+                type="text"
+                placeholder="Chapter 5: Trees and Graphs"
+                required
+              />
+            </label>
+
+            <label class="study-field">
+              <span>Subject</span>
+              <input
+                id="reading-subject"
+                type="text"
+                placeholder="Data Structures"
+                required
+              />
+            </label>
+
+            <label class="study-field">
+              <span>Source</span>
+              <input
+                id="reading-source"
+                type="text"
+                value="Textbook"
+                placeholder="Textbook"
+              />
+            </label>
+
+            <label class="study-field">
+              <span>Total Pages</span>
+              <input
+                id="reading-pages"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="45"
+                required
+              />
+            </label>
+          </div>
+
+          <label class="study-field">
+            <span>Notes (optional)</span>
+            <textarea
+              id="reading-notes"
+              rows="3"
+              placeholder="Any details about this reading..."
+            ></textarea>
+          </label>
+
+          <p id="add-reading-feedback" class="study-form-feedback" aria-live="polite"></p>
+
+          <div class="study-modal-actions">
+            <button
+              id="cancel-reading-modal"
+              class="btn-secondary"
+              type="button"
+            >
+              Cancel
+            </button>
+            <button class="btn-primary" type="submit">Add Reading</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/services/auth.js"></script>
+    <script src="js/services/grades.js"></script>
+    <script src="js/services/study-tracker.js"></script>
+    <script src="js/page-handlers/study.js"></script>
+  </body>
+</html>
