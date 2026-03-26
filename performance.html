@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <script
+      type="module"
+      src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.js"
+    ></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/page-handlers/performance.js" defer></script>
+    <title>Performance Insights - Academic Tracker</title>
+  </head>
+  <body class="performance-page">
+    <nav class="nav">
+      <div class="nav-left">
+        <a href="dashboard.html" class="nav-title">Academic Tracker</a>
+
+        <button
+          id="mobile-menu-icon"
+          class="menu-toggle"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-controls="nav-links"
+          aria-expanded="false"
+        >
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="nav-links" id="nav-links">
+        <a href="dashboard.html"
+          ><ion-icon name="grid-outline"></ion-icon> Dashboard</a
+        >
+        <a href="calculator.html"
+          ><ion-icon name="calculator-outline"></ion-icon> Calculator</a
+        >
+        <a href="performance.html" aria-current="page"
+          ><ion-icon name="analytics-outline"></ion-icon> Performance</a
+        >
+        <a href="study.html"
+          ><ion-icon name="book-outline"></ion-icon> Study Tracker</a
+        >
+
+        <div class="nav-right">
+          <a href="profile.html" id="profile">
+            <ion-icon name="person-circle-outline" class="nav-icon"></ion-icon>
+            Profile
+          </a>
+
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle theme"
+            class="nav-icon"
+          >
+            <span class="theme-toggle-content">
+              <ion-icon name="moon-outline"></ion-icon>
+              <span>Theme</span>
+            </span>
+            <span class="theme-slider" aria-hidden="true"></span>
+          </button>
+
+          <a href="#" id="logout-btn" class="logout"
+            ><ion-icon name="log-out-outline"></ion-icon> Logout</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
+
+    <main class="container performance-container">
+      <section class="performance-hero">
+        <h1>Performance Insights</h1>
+        <p>
+          Analyze your academic performance and identify areas for improvement
+        </p>
+      </section>
+
+      <section class="performance-metrics" aria-label="Performance summary">
+        <article class="metric-card">
+          <p class="metric-label">Current GPA</p>
+          <h2 id="current-gpa">0.00</h2>
+          <p class="metric-note metric-note-danger" id="gpa-delta">
+            Loading trend...
+          </p>
+        </article>
+
+        <article class="metric-card">
+          <p class="metric-label">Strong Subjects</p>
+          <h2 id="strong-subjects-count">0</h2>
+          <p class="metric-note" id="strong-subjects-label">GPA &ge; 3.7</p>
+        </article>
+
+        <article class="metric-card">
+          <p class="metric-label">Needs Attention</p>
+          <h2 id="attention-count">0</h2>
+          <p class="metric-note" id="attention-label">GPA &lt; 3.0</p>
+        </article>
+
+        <article class="metric-card">
+          <p class="metric-label">Total Credits</p>
+          <h2 id="total-credits">0</h2>
+          <p class="metric-note" id="credits-label">Completed</p>
+        </article>
+      </section>
+
+      <section class="performance-tabs" aria-label="Insight views">
+        <div class="tab-list" role="tablist" aria-label="Performance tabs">
+          <button
+            id="tab-trend"
+            class="tab-button active"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            aria-controls="panel-trend"
+            data-panel="trend"
+          >
+            Trend
+          </button>
+          <button
+            id="tab-courses"
+            class="tab-button"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="panel-courses"
+            data-panel="courses"
+          >
+            Courses
+          </button>
+          <button
+            id="tab-skills"
+            class="tab-button"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="panel-skills"
+            data-panel="skills"
+          >
+            Skills
+          </button>
+        </div>
+
+        <div class="tab-panels">
+          <article
+            id="panel-trend"
+            class="chart-card tab-panel active"
+            role="tabpanel"
+            aria-labelledby="tab-trend"
+          >
+            <div class="chart-heading">
+              <h3>GPA Trend Over Time</h3>
+              <p>Track your academic performance across semesters</p>
+            </div>
+
+            <div class="chart-shell">
+              <div class="line-chart" id="trend-chart"></div>
+              <div class="chart-legend">
+                <span class="legend-dot legend-blue"></span>
+                <span>GPA</span>
+              </div>
+            </div>
+          </article>
+
+          <article
+            id="panel-courses"
+            class="chart-card tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-courses"
+            hidden
+          >
+            <div class="chart-heading">
+              <h3>Course Performance Analysis</h3>
+              <p>Compare your grades across different courses</p>
+            </div>
+
+            <div class="chart-shell">
+              <div class="bar-chart" id="course-chart"></div>
+              <div class="chart-legend">
+                <span class="legend-dot legend-purple"></span>
+                <span>Grade Point</span>
+              </div>
+            </div>
+          </article>
+
+          <article
+            id="panel-skills"
+            class="chart-card tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-skills"
+            hidden
+          >
+            <div class="chart-heading">
+              <h3>Skills Assessment</h3>
+              <p>
+                Visual representation of your strengths across different areas
+              </p>
+            </div>
+
+            <div class="chart-shell">
+              <div class="radar-chart" id="skills-chart"></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="performance-grid">
+        <article class="insight-card">
+          <div class="insight-title-row">
+            <h3>Strongest Courses</h3>
+            <span class="insight-pill insight-pill-green">Top Performing</span>
+          </div>
+          <div class="course-list" id="top-courses-list"></div>
+        </article>
+
+        <article class="insight-card">
+          <div class="insight-title-row">
+            <h3>Focus Areas</h3>
+            <span class="insight-pill insight-pill-orange">Needs Review</span>
+          </div>
+          <div class="course-list" id="focus-courses-list"></div>
+        </article>
+      </section>
+
+      <section class="recommendations-section">
+        <article class="recommendations-card">
+          <div class="chart-heading">
+            <h3>Personalized Recommendations</h3>
+            <p>Based on your performance data</p>
+          </div>
+          <div class="recommendations-list" id="recommendations-list"></div>
+        </article>
+      </section>
+    </main>
+
+    <script src="js/mock-data.js"></script>
+    <script src="js/services/auth.js"></script>
+    <script src="js/services/grades.js"></script>
+  </body>
+</html>
