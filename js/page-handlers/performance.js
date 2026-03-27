@@ -21,9 +21,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 function setupNavigation() {
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", (event) => {
+    logoutBtn.addEventListener("click", async (event) => {
       event.preventDefault();
-      if (confirm("Are you sure you want to logout?")) {
+      const confirmed = await authService.confirmLogout();
+      if (confirmed) {
         authService.logout();
         window.location.href = "index.html";
       }
@@ -79,7 +80,12 @@ function renderPerformanceView(user, grades) {
   renderTrendChart("trend-chart", semesterPoints);
   renderCourseChart("course-chart", normalizedGrades);
   renderSkillsChart("skills-chart", buildSkillData(user, normalizedGrades));
-  renderRecommendations(normalizedGrades, semesterPoints, topCourses, focusCourses);
+  renderRecommendations(
+    normalizedGrades,
+    semesterPoints,
+    topCourses,
+    focusCourses,
+  );
 }
 
 function setupResponsiveCharts(user, grades) {
@@ -127,7 +133,7 @@ function buildSemesterTrend(grades) {
       courses.map((course) => ({
         grade: course.gradePoint,
         creditHours: course.creditHours,
-      }))
+      })),
     ),
   }));
 }
@@ -137,13 +143,17 @@ function updateMetrics(grades, semesterPoints) {
     grades.map((course) => ({
       grade: course.gradePoint,
       creditHours: course.creditHours,
-    }))
+    })),
   );
-  const strongSubjects = grades.filter((course) => course.gradePoint >= 3.7).length;
-  const attentionCount = grades.filter((course) => course.gradePoint < 3.0).length;
+  const strongSubjects = grades.filter(
+    (course) => course.gradePoint >= 3.7,
+  ).length;
+  const attentionCount = grades.filter(
+    (course) => course.gradePoint < 3.0,
+  ).length;
   const totalCredits = grades.reduce(
     (total, course) => total + Number(course.creditHours || 0),
-    0
+    0,
   );
   const gpaDelta = calculateTrendDelta(semesterPoints);
 
@@ -194,7 +204,7 @@ function renderCourseList(targetId, courses, tone) {
           </div>
           <div class="course-score ${tone}">${course.gradePoint.toFixed(1)}</div>
         </article>
-      `
+      `,
     )
     .join("");
 }
@@ -204,7 +214,8 @@ function renderTrendChart(targetId, points) {
   if (!container) return;
 
   if (points.length === 0) {
-    container.innerHTML = '<div class="empty-state">No GPA trend data available yet.</div>';
+    container.innerHTML =
+      '<div class="empty-state">No GPA trend data available yet.</div>';
     return;
   }
 
@@ -244,7 +255,7 @@ function renderTrendChart(targetId, points) {
         `<line x1="${point.x}" y1="${padding.top}" x2="${point.x}" y2="${
           height - padding.bottom
         }" class="chart-grid-line chart-grid-line-vertical" />
-         <text x="${point.x}" y="${height - 12}" text-anchor="middle" class="chart-axis-label">${compact ? `S${point.label.replace("Sem ", "")}` : point.label}</text>`
+         <text x="${point.x}" y="${height - 12}" text-anchor="middle" class="chart-axis-label">${compact ? `S${point.label.replace("Sem ", "")}` : point.label}</text>`,
     )
     .join("");
 
@@ -253,9 +264,9 @@ function renderTrendChart(targetId, points) {
       (point) => `
         <circle cx="${point.x}" cy="${point.y}" r="4" fill="var(--performance-blue)" />
         <text x="${point.x}" y="${point.y - 12}" text-anchor="middle" class="chart-point-label">${point.gpa.toFixed(
-          2
+          2,
         )}</text>
-      `
+      `,
     )
     .join("");
 
@@ -274,7 +285,8 @@ function renderCourseChart(targetId, courses) {
   if (!container) return;
 
   if (courses.length === 0) {
-    container.innerHTML = '<div class="empty-state">No course performance data available yet.</div>';
+    container.innerHTML =
+      '<div class="empty-state">No course performance data available yet.</div>';
     return;
   }
 
@@ -300,7 +312,7 @@ function renderCourseChart(targetId, courses) {
       return `
         <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="8" fill="var(--performance-purple)" />
         <text x="${x + barWidth / 2}" y="${y - 10}" text-anchor="middle" class="chart-point-label">${course.gradePoint.toFixed(
-          1
+          1,
         )}</text>
         <text
           x="${x + barWidth / 2}"
@@ -344,7 +356,8 @@ function renderSkillsChart(targetId, skills) {
   if (!container) return;
 
   if (skills.length === 0) {
-    container.innerHTML = '<div class="empty-state">No skill data available yet.</div>';
+    container.innerHTML =
+      '<div class="empty-state">No skill data available yet.</div>';
     return;
   }
 
@@ -439,7 +452,12 @@ function buildSkillData(user, grades) {
   return baseSkills;
 }
 
-function renderRecommendations(grades, semesterPoints, topCourses, focusCourses) {
+function renderRecommendations(
+  grades,
+  semesterPoints,
+  topCourses,
+  focusCourses,
+) {
   const container = document.getElementById("recommendations-list");
   if (!container) return;
 
@@ -447,7 +465,7 @@ function renderRecommendations(grades, semesterPoints, topCourses, focusCourses)
     grades,
     semesterPoints,
     topCourses,
-    focusCourses
+    focusCourses,
   );
 
   container.innerHTML = recommendations
@@ -462,18 +480,23 @@ function renderRecommendations(grades, semesterPoints, topCourses, focusCourses)
             <p>${item.text}</p>
           </div>
         </article>
-      `
+      `,
     )
     .join("");
 }
 
-function buildRecommendations(grades, semesterPoints, topCourses, focusCourses) {
+function buildRecommendations(
+  grades,
+  semesterPoints,
+  topCourses,
+  focusCourses,
+) {
   const recommendations = [];
   const currentGpa = gradesService.calculateGPA(
     grades.map((course) => ({
       grade: course.gradePoint,
       creditHours: course.creditHours,
-    }))
+    })),
   );
   const trendMessage = calculateTrendDelta(semesterPoints);
   const strongest = topCourses.map((course) => course.name).join(", ");
@@ -496,7 +519,7 @@ function buildRecommendations(grades, semesterPoints, topCourses, focusCourses) 
     text: weakest
       ? `Consider increasing revision time for ${weakest}. Targeting those courses will improve your overall CWA faster.`
       : `Your current GPA is ${currentGpa.toFixed(
-          2
+          2,
         )}. Keep reviewing your lowest-scoring topics to protect your average as you add more courses.`,
   });
 
@@ -517,7 +540,8 @@ function mapCourseToSkill(courseName) {
 
   if (name.includes("math")) return "Mathematics";
   if (name.includes("physics") || name.includes("chemistry")) return "Science";
-  if (name.includes("computer") || name.includes("program")) return "Programming";
+  if (name.includes("computer") || name.includes("program"))
+    return "Programming";
   if (name.includes("english") || name.includes("literature")) return "Writing";
   return "Analysis";
 }

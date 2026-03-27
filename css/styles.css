@@ -7,6 +7,7 @@
   --border-color: #e0e0e0;
   --accent-color: #155dfc;
   --accent-hover: #0056b3;
+  --hover-bg: #dbeafe;
   --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
   --bg-button: #ffffff;
@@ -26,6 +27,8 @@
   --performance-purple: #9810fa;
   --performance-green: #00a63e;
   --performance-orange: #f97316;
+  --hero-gradient1: #155dfc;
+  --hero-gradient2: #9810fa;
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -50,6 +53,7 @@
   --border-color: #262626;
   --accent-color: #51a2ff;
   --accent-hover: #79b8ff;
+  --hover-bg: #030712;
   --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.4);
   --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.5);
   --bg-button: #262626;
@@ -69,6 +73,8 @@
   --performance-purple: #c27aff;
   --performance-green: #05df72;
   --performance-orange: #fb923c;
+  --hero-gradient1: #51a2ff;
+  --hero-gradient2: #c27aff;
 }
 
 * {
@@ -102,14 +108,31 @@ main {
   min-height: calc(100vh - 200px);
 }
 
-.nav {
+.index-nav {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   height: 6vh;
   border-bottom: 1px solid var(--nav-border);
-  padding: 0 var(--spacing-md);
+  padding: 0.875rem 1rem;
+  background-color: var(--nav-bg);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav {
+  min-height: 6vh;
+  padding: 0.875rem 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 6vh;
+  border-bottom: 1px solid var(--nav-border);
   background-color: var(--nav-bg);
   position: sticky;
   top: 0;
@@ -122,32 +145,42 @@ main {
   font-size: 1.1rem;
 }
 
-.nav-links {
+.index-nav-right {
   display: flex;
-  gap: 20px;
-  align-items: center;
-  flex: 1;
-  justify-content: center;
 }
 
-.nav-links a {
+.index-nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-left: 10px;
+  border-radius: 1rem;
+}
+
+.index-nav-links a {
+  position: fixed;
   color: var(--text-primary);
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
   padding: 8px 12px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
 }
 
-.nav-links a:hover {
+.index-nav-links.active {
+  opacity: 0.8;
+}
+
+.index-nav-links a:hover {
   background: var(--hover-bg);
   color: var(--accent-color);
+  border: 1px, solid, var(--hover-bg);
+  border-radius: 1rem;
 }
 
 /* Hero section */
 
-.hero {
+.hero,
+.footer {
   padding: clamp(36px, 8vw, 52px) clamp(20px, 6vw, 28px) clamp(36px, 8vw, 48px);
   text-align: center;
   position: relative;
@@ -160,9 +193,26 @@ main {
   line-height: 1.1;
   margin-bottom: 18px;
   background-clip: text;
+  background: linear-gradient(
+    to right,
+    var(--hero-gradient1),
+    var(--hero-gradient2)
+  );
+  color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.hero p {
+.footer h1 {
+  font-size: clamp(25px, 6vw, 35px);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 18px;
+  background-clip: text;
+}
+
+.hero p,
+.footer p {
   color: var(--text-secondary);
   font-size: clamp(14px, 4vw, 20px);
   max-width: clamp(280px, 50vw, 1000px);
@@ -172,7 +222,8 @@ main {
 
 /* Hero Buttons */
 
-.hero-btns {
+.hero-btns,
+.footer-btns {
   display: flex;
   gap: 10px;
   justify-content: center;
@@ -203,6 +254,7 @@ main {
 .btn-secondary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   background: var(--bg-button);
   color: var(--text-primary);
   font-weight: 500;
@@ -1651,6 +1703,60 @@ main {
   height: 2.1rem;
   font-size: 0.82rem;
   border-radius: 0.5rem;
+}
+
+/* Logout Confirmation Dialog */
+
+.logout-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.logout-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--bg-button1) 38%, transparent);
+  cursor: pointer;
+}
+
+.logout-modal-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 28rem);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-medium);
+  padding: 1.5rem;
+}
+
+.logout-modal-dialog h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.logout-modal-dialog p {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.logout-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.logout-modal-actions button {
+  height: 2.2rem;
+  font-size: 0.9rem;
+  border-radius: 0.6rem;
 }
 
 @media (min-width: 48rem) {

@@ -3,18 +3,17 @@
 // =========================
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-  // Verify user is logged in
-  if (!authService.isLoggedIn()) {
-    console.log("Not logged in, redirecting to login page");
-    window.location.href = "login.html";
-    return;
-  }
+    // Verify user is logged in
+    if (!authService.isLoggedIn()) {
+      console.log("Not logged in, redirecting to login page");
+      window.location.href = "login.html";
+      return;
+    }
 
     // LOAD DATA
     const user = authService.getCurrentUser();
     const grades = await gradesService.getGrades();
     const sessions = await studyTrackerService.getSessions();
-    
 
     //  DISPLAY
     displayUser(user);
@@ -22,9 +21,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     //  NAVIGATION
     setupNavigation();
-// recent activities
+    // recent activities
     loadRecentActivities();
-
   } catch (error) {
     console.error("Dashboard error:", error);
     alert("Error loading dashboard");
@@ -42,7 +40,6 @@ function displayUser(user) {
   if (userNameEl) userNameEl.textContent = user.name;
   if (userEmailEl) userEmailEl.textContent = user.email;
 }
-
 
 // ==========================
 // DISPLAY STATS
@@ -68,9 +65,10 @@ function setupNavigation() {
   // Logout
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", (e) => {
+    logoutBtn.addEventListener("click", async (e) => {
       e.preventDefault();
-      if (confirm("Are you sure you want to logout?")) {
+      const confirmed = await authService.confirmLogout();
+      if (confirmed) {
         authService.logout();
         window.location.href = "index.html";
       }
@@ -84,17 +82,17 @@ function setupNavigation() {
   });
 
   // Nav links
-  document.querySelectorAll(".nav-links a").forEach(link => {
+  document.querySelectorAll(".nav-links a").forEach((link) => {
     link.addEventListener("click", () => {
       const text = link.textContent.toLowerCase();
 
       if (text.includes("dashboard")) return;
       if (text.includes("calculator")) window.location.href = "calculator.html";
-      if (text.includes("performance")) window.location.href = "performance.html";
+      if (text.includes("performance"))
+        window.location.href = "performance.html";
       if (text.includes("study")) window.location.href = "study.html";
     });
   });
-
 }
 
 // ==========================
@@ -114,11 +112,14 @@ function loadRecentActivities() {
 
   container.innerHTML = "";
 
-  activities.slice(-5).reverse().forEach(act => {
-    const item = document.createElement("div");
-    item.classList.add("activity-item");
+  activities
+    .slice(-5)
+    .reverse()
+    .forEach((act) => {
+      const item = document.createElement("div");
+      item.classList.add("activity-item");
 
-    item.innerHTML = `
+      item.innerHTML = `
       <div class="activity-icon">
         <ion-icon name="${act.icon || "time-outline"}"></ion-icon>
       </div>
@@ -128,8 +129,8 @@ function loadRecentActivities() {
       </div>
     `;
 
-    container.appendChild(item);
-  });
+      container.appendChild(item);
+    });
 }
 
 function addActivity(text, icon = "time-outline") {
@@ -138,7 +139,7 @@ function addActivity(text, icon = "time-outline") {
   activities.push({
     text,
     icon,
-    time: new Date().toLocaleString()
+    time: new Date().toLocaleString(),
   });
 
   localStorage.setItem("activities", JSON.stringify(activities));

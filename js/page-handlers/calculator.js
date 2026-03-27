@@ -44,9 +44,10 @@ async function initCalculatorPage() {
 function setupNavigation() {
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", (event) => {
+    logoutBtn.addEventListener("click", async (event) => {
       event.preventDefault();
-      if (confirm("Are you sure you want to logout?")) {
+      const confirmed = await authService.confirmLogout();
+      if (confirmed) {
         authService.logout();
         window.location.href = "index.html";
       }
