@@ -26,6 +26,14 @@
   --performance-purple: #9810fa;
   --performance-green: #00a63e;
   --performance-orange: #f97316;
+  --profile-card: var(--bg-secondary);
+  --profile-field-bg: #f8fafc;
+  --profile-border: var(--border-color);
+  --profile-text-soft: var(--text-secondary);
+  --profile-tip-bg: #eef4ff;
+  --profile-tip-border: #cfe0ff;
+  --profile-tip-text: #3157a5;
+  --toggle-bg: #666666;
 
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -69,6 +77,14 @@
   --performance-purple: #c27aff;
   --performance-green: #05df72;
   --performance-orange: #fb923c;
+  --profile-card: #0a0a0a;
+  --profile-field-bg: #202122;
+  --profile-border: rgba(148, 163, 184, 0.16);
+  --profile-text-soft: #b9c1cc;
+  --profile-tip-bg: rgba(37, 99, 235, 0.2);
+  --profile-tip-border: rgba(96, 165, 250, 0.28);
+  --profile-tip-text: #bfdbfe;
+  --toggle-bg: #f5f7fc;
 }
 
 * {
@@ -865,7 +881,7 @@ main {
 .performance-container {
   width: min(100% - 1.5rem, 75rem);
   margin: 0 auto;
-  padding: 1.25rem 0 2rem;
+  padding: 1rem 0 1.75rem;
 }
 
 .performance-hero {
@@ -886,7 +902,7 @@ main {
   margin: 1rem;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.9rem;
+  gap: 1rem;
 }
 
 .metric-card {
@@ -916,6 +932,14 @@ main {
 
 .metric-note-danger {
   color: var(--performance-orange);
+}
+
+#strong-subjects-count {
+  color: var(--performance-green)
+}
+
+#attention-count {
+  color: var(--performance-orange)
 }
 
 .performance-tabs {
@@ -949,7 +973,7 @@ main {
 }
 
 .tab-panels {
-  margin-top: 0.85rem;
+  margin-top: 1rem;
 }
 
 .chart-card,
@@ -964,40 +988,75 @@ main {
 
 .chart-heading h3,
 .insight-title-row h3 {
-  font-size: 1.05rem;
+  font-size: 0.98rem;
 }
 
 .chart-heading p {
   margin-top: 0.2rem;
   color: var(--text-secondary);
+  font-size: 0.86rem;
 }
 
 .chart-shell {
-  margin-top: 0.9rem;
+  margin-top: 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.25rem;
+}
+
+#panel-trend .chart-shell {
+  margin-top: 0.55rem;
+}
+
+#panel-skills .chart-shell {
+  padding: 0.35rem 0 0.45rem;
+  margin-top: 0.35rem;
+  display: flex;
+  justify-content: center;
 }
 
 .line-chart,
 .bar-chart,
 .radar-chart {
   width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
-.line-chart svg,
-.bar-chart svg,
-.radar-chart svg {
+.line-chart svg {
   width: 100%;
   height: auto;
   display: block;
 }
 
+.bar-chart svg {
+  width: auto;
+  min-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.radar-chart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 20rem;
+}
+
+.radar-chart svg {
+  width: min(32rem, 100%);
+  height: auto;
+  display: block;
+}
+
 .chart-legend {
-  margin-top: 0.65rem;
+  margin-top: 0.4rem;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   color: var(--text-secondary);
-  font-size: 0.82rem;
+  font-size: 0.76rem;
+  margin-left: auto;
 }
 
 .legend-dot {
@@ -1033,6 +1092,16 @@ main {
   fill: var(--text-primary);
   font-size: 11px;
   font-weight: 600;
+}
+
+.course-axis-label {
+  font-size: 9px;
+  letter-spacing: -0.01em;
+}
+
+.radar-axis-label {
+  font-size: 16px;
+  fill: color-mix(in srgb, var(--text-secondary) 88%, transparent);
 }
 
 .radar-ring {
@@ -1191,6 +1260,19 @@ main {
 }
 
 @media (min-width: 48rem) {
+  .performance-container {
+    padding: 1rem 0 1.6rem;
+  }
+
+  .performance-hero,
+  .performance-metrics,
+  .performance-tabs,
+  .performance-grid,
+  .recommendations-section {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
   .performance-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1198,17 +1280,54 @@ main {
   .chart-card,
   .insight-card,
   .recommendations-card {
-    padding: 1.15rem;
+    padding: 1.1rem;
+  }
+
+  .chart-heading h3,
+  .insight-title-row h3 {
+    font-size: 1rem;
+  }
+
+  .course-axis-label {
+    font-size: 10px;
+  }
+
+  .radar-axis-label {
+    font-size: 16px;
+  }
+
+  #panel-skills .chart-shell {
+    padding: 0.4rem 0 0.5rem;
+    margin-top: 0.4rem;
   }
 }
 
 @media (min-width: 64rem) {
+  .performance-container {
+    padding: 1rem 0 1.5rem;
+  }
+
+  .performance-hero,
+  .performance-metrics,
+  .performance-tabs,
+  .performance-grid,
+  .recommendations-section {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
   .performance-metrics {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .performance-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chart-card,
+  .insight-card,
+  .recommendations-card {
+    padding: 1rem;
   }
 }
 
@@ -1683,24 +1802,7 @@ main {
    ========================================== */
 
 .profile-page {
-  --profile-card: var(--bg-secondary);
-  --profile-field-bg: #f8fafc;
-  --profile-border: var(--border-color);
-  --profile-text-soft: var(--text-secondary);
-  --profile-tip-bg: #eef4ff;
-  --profile-tip-border: #cfe0ff;
-  --profile-tip-text: #3157a5;
   background-color: var(--bg-primary);
-}
-
-[data-theme="dark"] .profile-page {
-  --profile-card: #0a0a0a;
-  --profile-field-bg: #1d1e20;
-  --profile-border: rgba(148, 163, 184, 0.16);
-  --profile-text-soft: #94a3b8;
-  --profile-tip-bg: rgba(37, 99, 235, 0.2);
-  --profile-tip-border: rgba(96, 165, 250, 0.28);
-  --profile-tip-text: #bfdbfe;
 }
 
 .profile-page .container {
@@ -1835,13 +1937,13 @@ main {
   width: 1.3rem;
   height: 1.3rem;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--text-btn);
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
   transition: transform 0.2s ease;
 }
 
 .appearance-toggle.is-on {
-  background: var(--accent-color);
+  background: var(--toggle-bg);
 }
 
 .appearance-toggle.is-on .appearance-toggle-thumb {

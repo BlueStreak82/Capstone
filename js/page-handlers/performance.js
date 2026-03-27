@@ -1,3 +1,8 @@
+let performanceState = {
+  user: null,
+  grades: [],
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     if (!authService.isLoggedIn()) {
@@ -7,6 +12,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const user = authService.getCurrentUser();
     const grades = await gradesService.getGrades();
+    performanceState = { user, grades };
 
     initializeTabs();
     setupNavigation();
@@ -57,6 +63,12 @@ function initializeTabs() {
         const isActive = panel.id === `panel-${target}`;
         panel.classList.toggle("active", isActive);
         panel.hidden = !isActive;
+      });
+
+      requestAnimationFrame(() => {
+        if (performanceState.user) {
+          renderPerformanceView(performanceState.user, performanceState.grades);
+        }
       });
     });
   });
@@ -210,10 +222,10 @@ function renderTrendChart(targetId, points) {
 
   const width = getChartWidth(container, 720, 320);
   const compact = width < 460;
-  const height = compact ? 240 : width < 620 ? 280 : 320;
+  const height = compact ? 190 : width < 620 ? 215 : 235;
   const padding = compact
-    ? { top: 20, right: 14, bottom: 38, left: 30 }
-    : { top: 24, right: 24, bottom: 42, left: 40 };
+    ? { top: 16, right: 12, bottom: 30, left: 28 }
+    : { top: 18, right: 18, bottom: 34, left: 36 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
 
@@ -251,8 +263,8 @@ function renderTrendChart(targetId, points) {
   const pointsMarkup = coords
     .map(
       (point) => `
-        <circle cx="${point.x}" cy="${point.y}" r="4" fill="var(--performance-blue)" />
-        <text x="${point.x}" y="${point.y - 12}" text-anchor="middle" class="chart-point-label">${point.gpa.toFixed(
+        <circle cx="${point.x}" cy="${point.y}" r="3.2" fill="var(--performance-blue)" />
+        <text x="${point.x}" y="${point.y - 9}" text-anchor="middle" class="chart-point-label">${point.gpa.toFixed(
           2
         )}</text>
       `
@@ -278,37 +290,43 @@ function renderCourseChart(targetId, courses) {
     return;
   }
 
-  const width = getChartWidth(container, 720, 340);
-  const compact = width < 480;
-  const height = compact ? 300 : width < 620 ? 340 : 390;
+  const containerWidth = getChartWidth(container, 880, 320);
+  const width = Math.max(containerWidth, courses.length * 150);
+  const compact = containerWidth < 480;
+  const height = compact ? 238 : containerWidth < 620 ? 256 : 272;
   const padding = compact
-    ? { top: 18, right: 16, bottom: 96, left: 32 }
-    : width < 620
-      ? { top: 20, right: 18, bottom: 120, left: 42 }
-      : { top: 20, right: 28, bottom: 138, left: 56 };
+    ? { top: 14, right: 26, bottom: 52, left: 28 }
+    : containerWidth < 620
+      ? { top: 16, right: 34, bottom: 56, left: 36 }
+      : { top: 18, right: 42, bottom: 60, left: 44 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
-  const barWidth = chartWidth / Math.max(courses.length * 1.4, 1);
-  const gap = barWidth * 0.4;
+  const barWidth = Math.min(76, chartWidth / Math.max(courses.length * 1.08, 1));
+  const gap = Math.max(18, (chartWidth - barWidth * courses.length) / Math.max(courses.length - 1, 1));
 
   const bars = courses
     .map((course, index) => {
-      const x = padding.left + index * (barWidth + gap) + gap / 2;
+      const x = padding.left + index * (barWidth + gap);
       const barHeight = (course.gradePoint / 4) * chartHeight;
       const y = padding.top + chartHeight - barHeight;
       const label = shortenCourseLabel(course.name, compact);
+      const axisY = padding.top + chartHeight;
+      const labelY = axisY + (compact ? 18 : 20);
+      const labelX = x + barWidth / 2 - (compact ? 2 : 4);
       return `
-        <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="8" fill="var(--performance-purple)" />
-        <text x="${x + barWidth / 2}" y="${y - 10}" text-anchor="middle" class="chart-point-label">${course.gradePoint.toFixed(
-          1
-        )}</text>
+        <g class="course-bar-group">
+          <title>${course.name}: ${course.gradePoint.toFixed(1)}</title>
+          <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="8" fill="var(--performance-purple)" class="course-bar-rect" />
+        </g>
         <text
-          x="${x + barWidth / 2}"
-          y="${height - (compact ? 18 : 26)}"
+          x="${labelX}"
+          y="${labelY}"
           text-anchor="end"
-          transform="rotate(-45 ${x + barWidth / 2} ${height - (compact ? 18 : 26)})"
-          class="chart-axis-label"
-        >${label}</text>
+          transform="rotate(-45 ${labelX} ${labelY})"
+          class="chart-axis-label course-axis-label"
+        >
+          ${label}
+        </text>
       `;
     })
     .join("");
@@ -322,7 +340,7 @@ function renderCourseChart(targetId, courses) {
     .join("");
 
   container.innerHTML = `
-    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Course performance chart">
+    <svg class="course-chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Course performance chart">
       ${lines}
       ${bars}
     </svg>
@@ -330,13 +348,33 @@ function renderCourseChart(targetId, courses) {
 }
 
 function shortenCourseLabel(name, compact = false) {
-  const maxLength = compact ? 10 : 14;
+  const shortMap = compact
+    ? {
+        Mathematics: "M",
+        "English Literature": "EL",
+        Physics: "P",
+        Chemistry: "C",
+        "Computer Science": "CS",
+        Programming: "PG",
+      }
+    : {
+        Mathematics: "Math",
+        "English Literature": "Eng Lit",
+        Physics: "Phys",
+        Chemistry: "Chem",
+        "Computer Science": "Comp Sci",
+        Programming: "Prog",
+      };
+
+  if (shortMap[name]) return shortMap[name];
+
+  const maxLength = compact ? 3 : 8;
   if (name.length <= maxLength) return name;
 
-  return name
-    .split(" ")
-    .map((word) => word[0])
-    .join("");
+  const trimmed = name.replace(/\s+/g, "");
+  if (trimmed.length <= 2) return trimmed;
+
+  return `${trimmed[0]}${trimmed[trimmed.length - 1]}`;
 }
 
 function renderSkillsChart(targetId, skills) {
@@ -350,7 +388,7 @@ function renderSkillsChart(targetId, skills) {
 
   const size = getRadarSize(container);
   const center = size / 2;
-  const radius = size * 0.28;
+  const radius = size * 0.33;
   const levels = 5;
   const angleStep = (Math.PI * 2) / skills.length;
 
@@ -372,11 +410,12 @@ function renderSkillsChart(targetId, skills) {
       const angle = -Math.PI / 2 + index * angleStep;
       const x = center + Math.cos(angle) * radius;
       const y = center + Math.sin(angle) * radius;
-      const labelX = center + Math.cos(angle) * (radius + 28);
-      const labelY = center + Math.sin(angle) * (radius + 22);
+      const labelDistance = radius + 34;
+      const labelX = center + Math.cos(angle) * labelDistance;
+      const labelY = center + Math.sin(angle) * labelDistance;
       return `
         <line x1="${center}" y1="${center}" x2="${x}" y2="${y}" class="radar-axis" />
-        <text x="${labelX}" y="${labelY}" text-anchor="middle" class="chart-axis-label">${skill.label}</text>
+        <text x="${labelX}" y="${labelY}" text-anchor="middle" class="chart-axis-label radar-axis-label">${skill.label}</text>
       `;
     })
     .join("");
@@ -408,9 +447,10 @@ function getChartWidth(container, maxWidth, minWidth) {
 
 function getRadarSize(container) {
   const shell = container.closest(".chart-shell");
-  const availableWidth = shell ? shell.clientWidth - 32 : container.clientWidth;
-  const boundedWidth = Math.max(260, Math.min(420, availableWidth || 360));
-  return boundedWidth < 320 ? 300 : boundedWidth;
+  const availableWidth = shell ? shell.clientWidth - 24 : container.clientWidth;
+  if (availableWidth < 360) return 420;
+  if (availableWidth < 640) return 480;
+  return 520;
 }
 
 function buildSkillData(user, grades) {
