@@ -49,6 +49,11 @@
         >
 
         <div class="nav-right">
+          <a href="profile.html" id="profile">
+            <ion-icon name="person-outline" class="nav-icon"></ion-icon>
+            Profile
+          </a>
+
           <button
             id="theme-toggle"
             type="button"
@@ -111,6 +116,27 @@
                 Loaded from mock data for
                 <span id="calc-user-name">Student</span>
               </p>
+
+              <div class="calc-term-row" aria-label="Calculation period">
+                <label class="calc-term-field" for="calc-semester">
+                  <span>Semester</span>
+                  <select id="calc-semester">
+                    <option value="Semester 1">Semester 1</option>
+                    <option value="Semester 2">Semester 2</option>
+                  </select>
+                </label>
+
+                <label class="calc-term-field" for="calc-year">
+                  <span>Year</span>
+                  <input
+                    id="calc-year"
+                    type="number"
+                    min="2000"
+                    max="2100"
+                    step="1"
+                  />
+                </label>
+              </div>
             </div>
 
             <div id="course-rows" class="calc-course-rows"></div>

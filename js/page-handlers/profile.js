@@ -1,3 +1,6 @@
+const USER_ACTIVITY_KEY_PREFIX = "academic-tracker-activities-";
+const USER_CALC_COURSES_KEY_PREFIX = "academic-tracker-calc-courses-";
+
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     if (!authService.isLoggedIn()) {
@@ -26,20 +29,83 @@ function populateProfile(user, grades) {
 }
 
 function populateStats(user, grades, sessions) {
-  const activities = JSON.parse(localStorage.getItem("activities")) || [];
+  const activityKey = `${USER_ACTIVITY_KEY_PREFIX}${user?.id || ""}`;
+  const activities = JSON.parse(localStorage.getItem(activityKey)) || [];
+  const calculatedCourses = getUserCalculatedCourses(user?.id);
+  const effectiveCourses = mergeCourseSources(grades, calculatedCourses);
+  const totalCoursesTracked = effectiveCourses.length;
+
   const calculationCount = activities.filter((item) =>
     String(item.text || "")
       .toLowerCase()
-      .includes("gpa"),
+      .match(/gpa|cwa/),
   ).length;
 
   setText("student-id", formatUserId(user));
   setText("member-since", getMemberSince(user));
-  setText("courses-tracked", `${grades.length} Courses`);
+  setText(
+    "courses-tracked",
+    `${totalCoursesTracked} ${totalCoursesTracked === 1 ? "Course" : "Courses"}`,
+  );
   setText(
     "gpa-calculations",
-    `${Math.max(calculationCount, grades.length || sessions.length || 0)} Calculations`,
+    `${calculationCount} ${calculationCount === 1 ? "Calculation" : "Calculations"}`,
   );
+}
+
+function getUserCalculatedCourses(userId) {
+  if (!userId) {
+    return [];
+  }
+
+  try {
+    const raw = localStorage.getItem(
+      `${USER_CALC_COURSES_KEY_PREFIX}${userId}`,
+    );
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function mergeCourseSources(baseCourses, calculatedCourses) {
+  const bySemester = new Map();
+
+  baseCourses.forEach((course) => {
+    const semester = String(course.semester || "Unspecified");
+    if (!bySemester.has(semester)) {
+      bySemester.set(semester, []);
+    }
+    bySemester.get(semester).push(course);
+  });
+
+  calculatedCourses.forEach((course) => {
+    const semester = String(course.semester || "Unspecified");
+    if (!bySemester.has(semester)) {
+      bySemester.set(semester, []);
+    }
+
+    const semesterBucket = bySemester.get(semester) || [];
+    const existingIndex = semesterBucket.findIndex(
+      (item) =>
+        String(item.name).toLowerCase() === String(course.name).toLowerCase(),
+    );
+
+    if (existingIndex >= 0) {
+      semesterBucket[existingIndex] = course;
+    } else {
+      semesterBucket.push(course);
+    }
+
+    bySemester.set(semester, semesterBucket);
+  });
+
+  return Array.from(bySemester.values()).flat();
 }
 
 function setupNavigation() {

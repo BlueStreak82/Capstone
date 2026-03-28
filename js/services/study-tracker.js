@@ -4,6 +4,10 @@
  */
 
 class StudyTrackerService {
+  constructor() {
+    this.storagePrefix = "academic-tracker-study-sessions-";
+  }
+
   /**
    * Get all study sessions for logged-in user
    */
@@ -11,7 +15,14 @@ class StudyTrackerService {
     const user = authService.getCurrentUser();
     if (!user) throw new Error("Not logged in");
 
-    return await MockData.getStudySessions(user.id);
+    const stored = this._readStoredSessions(user.id);
+    if (stored !== null) {
+      return stored;
+    }
+
+    const mockSessions = await MockData.getStudySessions(user.id);
+    this._writeStoredSessions(user.id, mockSessions);
+    return mockSessions;
   }
 
   /**
@@ -22,7 +33,15 @@ class StudyTrackerService {
     const user = authService.getCurrentUser();
     if (!user) throw new Error("Not logged in");
 
-    return await MockData.addStudySession(user.id, sessionData);
+    const sessions = await this.getSessions();
+    const newSession = {
+      id: Math.max(...sessions.map((s) => Number(s.id) || 0), 0) + 1,
+      ...sessionData,
+    };
+
+    const updated = [...sessions, newSession];
+    this._writeStoredSessions(user.id, updated);
+    return newSession;
   }
 
   /**
@@ -94,6 +113,28 @@ class StudyTrackerService {
       }
     }
     return streak;
+  }
+
+  _storageKey(userId) {
+    return `${this.storagePrefix}${userId}`;
+  }
+
+  _readStoredSessions(userId) {
+    try {
+      const raw = localStorage.getItem(this._storageKey(userId));
+      if (!raw) {
+        return null;
+      }
+
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  _writeStoredSessions(userId, sessions) {
+    localStorage.setItem(this._storageKey(userId), JSON.stringify(sessions));
   }
 }
 

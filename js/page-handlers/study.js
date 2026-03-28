@@ -7,6 +7,7 @@ const studyState = {
 
 const HOURS_GOAL = 40;
 const READINGS_GOAL = 5;
+const LEGACY_SEED_CLEAR_FLAG = "academic-tracker-legacy-seed-cleared-v1";
 
 document.addEventListener("DOMContentLoaded", initStudyPage);
 
@@ -31,6 +32,8 @@ async function initStudyPage() {
 
     studyState.grades = grades;
     studyState.sessions = sessions;
+
+    clearLegacySeededReadings(studyState.user.id);
     studyState.readings = loadReadings(studyState.user.id, grades, sessions);
 
     renderAll();
@@ -38,6 +41,20 @@ async function initStudyPage() {
     console.error("Study tracker load error:", error);
     alert("Could not load study tracker data.");
   }
+}
+
+function clearLegacySeededReadings(userId) {
+  // Keep this migration narrow: only clear the old seeded data account once.
+  if (userId !== 3) {
+    return;
+  }
+
+  if (localStorage.getItem(LEGACY_SEED_CLEAR_FLAG) === "true") {
+    return;
+  }
+
+  localStorage.removeItem(getReadingsStorageKey(userId));
+  localStorage.setItem(LEGACY_SEED_CLEAR_FLAG, "true");
 }
 
 function setupNavigation() {
@@ -94,7 +111,7 @@ function setupReadingActions() {
     return;
   }
 
-  readingList.addEventListener("click", (event) => {
+  readingList.addEventListener("click", async (event) => {
     const completeButton = event.target.closest(".mark-complete-btn");
     if (completeButton) {
       const itemId = Number(completeButton.dataset.id);
@@ -114,8 +131,59 @@ function setupReadingActions() {
       }
 
       updateReadingProgress(itemId, Number(input.value));
+      return;
+    }
+
+    const logTimeButton = event.target.closest(".log-session-btn");
+    if (logTimeButton) {
+      const itemId = Number(logTimeButton.dataset.id);
+      const input = readingList.querySelector(
+        `.session-time-input[data-id="${itemId}"]`,
+      );
+
+      if (!input) {
+        return;
+      }
+
+      const minutes = Number(input.value);
+      await logStudyTime(itemId, minutes, input);
     }
   });
+}
+
+async function logStudyTime(itemId, minutes, inputElement) {
+  if (!Number.isFinite(minutes) || minutes <= 0) {
+    alert("Enter a valid study time in minutes.");
+    inputElement?.focus();
+    return;
+  }
+
+  const reading = studyState.readings.find((item) => item.id === itemId);
+  if (!reading) {
+    return;
+  }
+
+  const course = studyState.grades.find(
+    (grade) => grade.name === reading.subject,
+  );
+  const sessionData = {
+    courseId: course?.id || reading.id,
+    courseName: course?.name || reading.subject || "General Study",
+    date: new Date().toISOString().split("T")[0],
+    hoursSpent: parseFloat((minutes / 60).toFixed(2)),
+    materials: [reading.title],
+    notes: reading.notes || "Study time logged from reading tracker.",
+  };
+
+  try {
+    const createdSession = await studyTrackerService.addSession(sessionData);
+    studyState.sessions.unshift(createdSession);
+    inputElement.value = "30";
+    renderAll();
+  } catch (error) {
+    console.error("Failed to log study time:", error);
+    alert("Could not save study time. Please try again.");
+  }
 }
 
 function setupAddReadingModal() {
@@ -354,21 +422,38 @@ function renderReadings() {
           </div>
 
           <div class="reading-actions">
-            <input
-              class="progress-input"
-              data-id="${item.id}"
-              type="number"
-              min="0"
-              max="${item.totalPages}"
-              value="${item.currentPages}"
-              aria-label="Update pages read"
-            />
-            <button class="update-progress-btn" data-id="${item.id}" type="button">
-              Update
-            </button>
-            <button class="mark-complete-btn" data-id="${item.id}" type="button">
-              Mark Complete
-            </button>
+            <div class="reading-action-group">
+              <input
+                class="progress-input"
+                data-id="${item.id}"
+                type="number"
+                min="0"
+                max="${item.totalPages}"
+                value="${item.currentPages}"
+                aria-label="Update pages read"
+              />
+              <button class="update-progress-btn" data-id="${item.id}" type="button">
+                Update Pages
+              </button>
+              <button class="mark-complete-btn" data-id="${item.id}" type="button">
+                Mark Complete
+              </button>
+            </div>
+
+            <div class="reading-action-group">
+              <input
+                class="session-time-input"
+                data-id="${item.id}"
+                type="number"
+                min="1"
+                step="1"
+                value="30"
+                aria-label="Add study time in minutes"
+              />
+              <button class="log-session-btn" data-id="${item.id}" type="button">
+                Log Time (min)
+              </button>
+            </div>
           </div>
 
           ${item.notes ? `<p class="item-meta">Notes: ${escapeHtml(item.notes)}</p>` : ""}

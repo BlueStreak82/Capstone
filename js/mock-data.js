@@ -99,15 +99,7 @@ const MOCK_GRADES = [
   },
   {
     userId: 3,
-    courses: [
-      {
-        id: 301,
-        name: "Web Development",
-        grade: 96,
-        creditHours: 3,
-        semester: "Fall 2025",
-      },
-    ],
+    courses: [],
   },
 ];
 
@@ -163,17 +155,7 @@ const MOCK_STUDY_SESSIONS = [
   },
   {
     userId: 3,
-    sessions: [
-      {
-        id: 1,
-        courseId: 301,
-        courseName: "Web Development",
-        date: "2026-03-14",
-        hoursSpent: 4,
-        materials: ["React Documentation", "CSS Grid"],
-        notes: "Built responsive dashboard",
-      },
-    ],
+    sessions: [],
   },
 ];
 

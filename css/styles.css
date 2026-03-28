@@ -775,6 +775,37 @@ main {
   font-size: 0.95rem;
 }
 
+.calc-term-row {
+  margin-top: 0.8rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+}
+
+.calc-term-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.calc-term-field select,
+.calc-term-field input {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 0.6rem;
+  padding: 0.62rem 0.7rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
+.calc-term-field select:focus,
+.calc-term-field input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
 .calc-course-rows {
   margin-top: 0.9rem;
   display: flex;
@@ -896,6 +927,10 @@ main {
 }
 
 @media (min-width: 768px) {
+  .calc-term-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .calc-type-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -987,11 +1022,11 @@ main {
 }
 
 #strong-subjects-count {
-  color: var(--performance-green)
+  color: var(--performance-green);
 }
 
 #attention-count {
-  color: var(--performance-orange)
+  color: var(--performance-orange);
 }
 
 .performance-tabs {
@@ -1605,6 +1640,13 @@ main {
 .reading-actions {
   margin-top: 0.65rem;
   display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.reading-action-group {
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.45rem;
 }
 
@@ -1890,6 +1932,10 @@ main {
 
   .reading-actions {
     justify-content: flex-start;
+  }
+
+  .reading-action-group {
+    flex-wrap: nowrap;
   }
 
   .study-form-grid {

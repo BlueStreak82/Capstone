@@ -1,6 +1,12 @@
 // =========================
 // DASHBOARD INITIALIZATION
 // =========================
+const USER_ACTIVITY_KEY_PREFIX = "academic-tracker-activities-";
+const LEGACY_ACTIVITY_MIGRATION_KEY = "academic-tracker-activities-migrated-v1";
+const USER_CALC_PREF_KEY_PREFIX = "academic-tracker-calc-pref-";
+const USER_CALC_COURSES_KEY_PREFIX = "academic-tracker-calc-courses-";
+const CLEAR_ACTIVITY_DIALOG_ID = "clear-activity-confirm-dialog";
+
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Verify user is logged in
@@ -17,10 +23,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     //  DISPLAY
     displayUser(user);
-    displayStats(grades, sessions);
+    displayStats(user, grades, sessions);
+    migrateLegacyActivities(user.id);
 
     //  NAVIGATION
     setupNavigation();
+    setupClearActivityAction();
     // recent activities
     loadRecentActivities();
   } catch (error) {
@@ -44,10 +52,38 @@ function displayUser(user) {
 // ==========================
 // DISPLAY STATS
 // ==========================
-function displayStats(grades, sessions) {
-  // GPA
-  const gpa = gradesService.calculateGPA(grades);
-  document.getElementById("gpa-value").textContent = gpa;
+function displayStats(user, grades, sessions) {
+  const pref = getCalculationPreference(user.id);
+  const calcMode = pref?.mode === "cwa" ? "cwa" : "gpa";
+  const calculatedCourses = getUserCalculatedCourses(user.id);
+  const effectiveGrades =
+    calculatedCourses.length > 0 ? calculatedCourses : grades;
+
+  const metricValue =
+    effectiveGrades.length > 0
+      ? calcMode === "cwa"
+        ? calculateCwa(effectiveGrades)
+        : gradesService.calculateGPA(effectiveGrades)
+      : Number(pref?.value || 0);
+
+  const metricLabel = document.getElementById("current-metric-label");
+  const metricValueEl = document.getElementById("gpa-value");
+  const metricNote = document.getElementById("current-metric-note");
+
+  if (metricLabel) {
+    metricLabel.textContent =
+      calcMode === "cwa" ? "Current CWA" : "Current GPA";
+  }
+
+  if (metricValueEl) {
+    metricValueEl.textContent = Number(metricValue).toFixed(2);
+  }
+
+  if (metricNote) {
+    metricNote.textContent = pref?.updatedAt
+      ? `Updated ${formatRelativeDate(pref.updatedAt)}`
+      : "Latest calculated value";
+  }
 
   // Study Hours
   const totalHours = studyTrackerService.calculateTotalHours(sessions);
@@ -100,13 +136,15 @@ function setupNavigation() {
 // ==========================
 function loadRecentActivities() {
   const container = document.querySelector(".activity-list");
+  const user = authService.getCurrentUser();
 
-  if (!container) return;
+  if (!container || !user) return;
 
-  const activities = JSON.parse(localStorage.getItem("activities")) || [];
+  const activities =
+    JSON.parse(localStorage.getItem(getActivityStorageKey(user.id))) || [];
 
   if (activities.length === 0) {
-    container.innerHTML = "<p>No recent activity</p>";
+    container.innerHTML = '<p class="empty-activity">No recent activity</p>';
     return;
   }
 
@@ -133,8 +171,110 @@ function loadRecentActivities() {
     });
 }
 
+function setupClearActivityAction() {
+  const clearBtn = document.getElementById("clear-activity-btn");
+  const user = authService.getCurrentUser();
+
+  if (!clearBtn || !user) {
+    return;
+  }
+
+  clearBtn.addEventListener("click", async () => {
+    const confirmed = await confirmClearActivity();
+    if (!confirmed) {
+      return;
+    }
+
+    localStorage.removeItem(getActivityStorageKey(user.id));
+    loadRecentActivities();
+  });
+}
+
+function confirmClearActivity() {
+  const existingDialog = document.getElementById(CLEAR_ACTIVITY_DIALOG_ID);
+  if (existingDialog) {
+    existingDialog.remove();
+  }
+
+  return new Promise((resolve) => {
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const previousOverflow = document.body.style.overflow;
+
+    const modal = document.createElement("div");
+    modal.id = CLEAR_ACTIVITY_DIALOG_ID;
+    modal.className = "logout-modal";
+    modal.innerHTML = `
+      <div class="logout-modal-backdrop" data-clear-activity-action="cancel"></div>
+      <div
+        class="logout-modal-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="clear-activity-title"
+        aria-describedby="clear-activity-message"
+      >
+        <h3 id="clear-activity-title">Clear Recent Activity?</h3>
+        <p id="clear-activity-message">This will remove all recent activity entries for your current account.</p>
+        <div class="logout-modal-actions">
+          <button type="button" class="btn-secondary" data-clear-activity-action="cancel">Cancel</button>
+          <button type="button" class="btn-primary" data-clear-activity-action="confirm">Clear Activity</button>
+        </div>
+      </div>
+    `;
+
+    const cleanup = (didConfirm) => {
+      document.removeEventListener("keydown", handleKeydown);
+      modal.remove();
+      document.body.style.overflow = previousOverflow;
+      if (previouslyFocused) {
+        previouslyFocused.focus();
+      }
+      resolve(didConfirm);
+    };
+
+    const handleKeydown = (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        cleanup(false);
+      }
+    };
+
+    modal.addEventListener("click", (event) => {
+      const actionElement = event.target.closest(
+        "[data-clear-activity-action]",
+      );
+      if (!actionElement) {
+        return;
+      }
+
+      const action = actionElement.getAttribute("data-clear-activity-action");
+      cleanup(action === "confirm");
+    });
+
+    document.body.appendChild(modal);
+    document.body.style.overflow = "hidden";
+
+    const cancelButton = modal.querySelector(
+      '[data-clear-activity-action="cancel"]',
+    );
+    if (cancelButton instanceof HTMLElement) {
+      cancelButton.focus();
+    }
+
+    document.addEventListener("keydown", handleKeydown);
+  });
+}
+
 function addActivity(text, icon = "time-outline") {
-  const activities = JSON.parse(localStorage.getItem("activities")) || [];
+  const user = authService.getCurrentUser();
+  if (!user) {
+    return;
+  }
+
+  const key = getActivityStorageKey(user.id);
+  const activities = JSON.parse(localStorage.getItem(key)) || [];
 
   activities.push({
     text,
@@ -142,5 +282,89 @@ function addActivity(text, icon = "time-outline") {
     time: new Date().toLocaleString(),
   });
 
-  localStorage.setItem("activities", JSON.stringify(activities));
+  localStorage.setItem(key, JSON.stringify(activities));
+}
+
+function getActivityStorageKey(userId) {
+  return `${USER_ACTIVITY_KEY_PREFIX}${userId}`;
+}
+
+function migrateLegacyActivities(userId) {
+  void userId;
+
+  if (localStorage.getItem(LEGACY_ACTIVITY_MIGRATION_KEY) === "true") {
+    return;
+  }
+
+  const legacyRaw = localStorage.getItem("activities");
+  if (!legacyRaw) {
+    localStorage.setItem(LEGACY_ACTIVITY_MIGRATION_KEY, "true");
+    return;
+  }
+
+  localStorage.removeItem("activities");
+  localStorage.setItem(LEGACY_ACTIVITY_MIGRATION_KEY, "true");
+}
+
+function getCalculationPreference(userId) {
+  try {
+    const raw = localStorage.getItem(`${USER_CALC_PREF_KEY_PREFIX}${userId}`);
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function getUserCalculatedCourses(userId) {
+  try {
+    const raw = localStorage.getItem(
+      `${USER_CALC_COURSES_KEY_PREFIX}${userId}`,
+    );
+    if (!raw) {
+      return [];
+    }
+
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function calculateCwa(courses) {
+  if (!courses || courses.length === 0) {
+    return 0;
+  }
+
+  const total = courses.reduce(
+    (sum, course) => sum + Number(course.grade || 0),
+    0,
+  );
+  return total / courses.length;
+}
+
+function formatRelativeDate(isoDate) {
+  const timestamp = new Date(isoDate).getTime();
+  if (Number.isNaN(timestamp)) {
+    return "recently";
+  }
+
+  const diffMs = Date.now() - timestamp;
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
+  if (diffMinutes < 1) return "just now";
+  if (diffMinutes < 60)
+    return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24)
+    return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
 }
