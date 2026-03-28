@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/dashboard.css" /> 
+    <link rel="stylesheet" href="css/dashboard.css" />
     <script
       type="module"
       src="https://unpkg.com/ionicons@7/dist/ionicons/ionicons.esm.js"
@@ -16,10 +16,9 @@
     <script src="js/script.js" defer></script>
     <script src="js/page-handlers/dashboard.js" defer></script>
     <title>Dashboard - Academic Performance Tracker</title>
-
   </head>
   <body>
-     <!-- NAVBAR -->
+    <!-- NAVBAR -->
     <nav class="nav">
       <div class="nav-left">
         <a href="dashboard.html" class="nav-title">Academic Tracker</a>
@@ -36,42 +35,42 @@
         </button>
       </div>
 
-        <div class="nav-links" id="nav-links">
-          <a href="#"><ion-icon name="grid-outline"></ion-icon> Dashboard</a>
-          <a href="calculator.html"
-            ><ion-icon name="calculator-outline"></ion-icon> Calculator</a
-          >
-          <a href="performance.html"
-            ><ion-icon name="analytics-outline"></ion-icon> Performance</a
-          >
-          <a href="study.html"
-            ><ion-icon name="book-outline"></ion-icon> Study Tracker</a
-          >
+      <div class="nav-links" id="nav-links">
+        <a href="#"><ion-icon name="grid-outline"></ion-icon> Dashboard</a>
+        <a href="calculator.html"
+          ><ion-icon name="calculator-outline"></ion-icon> Calculator</a
+        >
+        <a href="performance.html"
+          ><ion-icon name="analytics-outline"></ion-icon> Performance</a
+        >
+        <a href="study.html"
+          ><ion-icon name="book-outline"></ion-icon> Study Tracker</a
+        >
 
-          <div class="nav-right">
-            <a href="profile.html" id="profile">
-              <ion-icon name="person-outline" class="nav-icon"></ion-icon>
-              Profile
-            </a>
+        <div class="nav-right">
+          <a href="profile.html" id="profile">
+            <ion-icon name="person-outline" class="nav-icon"></ion-icon>
+            Profile
+          </a>
 
-            <button
-              id="theme-toggle"
-              type="button"
-              aria-label="Toggle theme"
-              class="nav-icon"
-            >
-              <span class="theme-toggle-content">
-                <ion-icon name="moon-outline"></ion-icon>
-                <span>Theme</span>
-              </span>
-              <span class="theme-slider" aria-hidden="true"></span>
-            </button>
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle theme"
+            class="nav-icon"
+          >
+            <span class="theme-toggle-content">
+              <ion-icon name="moon-outline"></ion-icon>
+              <span>Theme</span>
+            </span>
+            <span class="theme-slider" aria-hidden="true"></span>
+          </button>
 
-            <a href="#" id="logout-btn" class="logout"
-              ><ion-icon name="log-out-outline"></ion-icon> Logout</a
-            >
-          </div>
+          <a href="#" id="logout-btn" class="logout"
+            ><ion-icon name="log-out-outline"></ion-icon> Logout</a
+          >
         </div>
+      </div>
     </nav>
 
     <div class="nav-backdrop" id="nav-backdrop" aria-hidden="true"></div>
@@ -88,14 +87,20 @@
       <!-- TOP CARDS -->
       <section class="dashboard-cards">
         <div class="dashboard-card gradient-blue">
-          <ion-icon name="trophy-outline" class="card-icon icon-blue"></ion-icon>
-          <h4>Current GPA</h4>
+          <ion-icon
+            name="trophy-outline"
+            class="card-icon icon-blue"
+          ></ion-icon>
+          <h4 id="current-metric-label">Current GPA</h4>
           <h2 id="gpa-value">3.45</h2>
-          <p>+0.15 from last semester</p>
+          <p id="current-metric-note">Latest calculated value</p>
         </div>
 
         <div class="dashboard-card gradient-purple">
-          <ion-icon name="time-outline" class="card-icon icon-purple"></ion-icon>
+          <ion-icon
+            name="time-outline"
+            class="card-icon icon-purple"
+          ></ion-icon>
           <h4>Study Hours</h4>
           <h2 id="total-hours">42h</h2>
           <p>This week</p>
@@ -153,8 +158,15 @@
 
       <!-- RECENT ACTIVITY -->
       <section class="recent" id="recent-sessions">
-        <h3>Recent Activity</h3>
-        <p>Your latest academic activities</p>
+        <div class="recent-head">
+          <div>
+            <h3>Recent Activity</h3>
+            <p>Your latest academic activities</p>
+          </div>
+          <button id="clear-activity-btn" class="btn-secondary" type="button">
+            Clear Activity
+          </button>
+        </div>
 
         <div class="activity-list">
           <div class="activity-item">
@@ -187,9 +199,8 @@
             </div>
           </div>
         </div>
-
       </section>
-      </main>
+    </main>
 
     <!-- Load services before page handler -->
     <script src="js/mock-data.js"></script>
