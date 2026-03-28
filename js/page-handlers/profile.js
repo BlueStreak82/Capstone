@@ -33,8 +33,8 @@ function populateStats(user, grades, sessions) {
       .includes("gpa"),
   ).length;
 
-  setText("student-id", user?.id || 1);
-  setText("member-since", formatMemberSince(user?.createdAt));
+  setText("student-id", formatUserId(user));
+  setText("member-since", getMemberSince(user));
   setText("courses-tracked", `${grades.length} Courses`);
   setText(
     "gpa-calculations",
@@ -58,6 +58,7 @@ function setupNavigation() {
 
 function setupAppearanceToggle() {
   const toggle = document.getElementById("appearance-toggle");
+  const themeLabel = document.querySelector(".mode-text");
   const themeText = document.getElementById("appearance-theme-text");
   const themeIcon = document.getElementById("appearance-theme-icon");
   const navToggle = document.getElementById("theme-toggle");
@@ -70,10 +71,14 @@ function setupAppearanceToggle() {
     toggle.setAttribute("aria-checked", String(isDark));
     toggle.classList.toggle("is-on", isDark);
 
+    if (themeLabel) {
+      themeLabel.textContent = isDark ? "Dark Mode" : "Light Mode";
+    }
+
     if (themeText) {
       themeText.textContent = isDark
         ? "Dark mode is enabled"
-        : "Switch to dark mode";
+        : "Light mode is enabled";
     }
 
     if (themeIcon) {
@@ -107,11 +112,61 @@ function setupAppearanceToggle() {
   });
 }
 
+function formatUserId(user) {
+  const numericId = Number(user?.id);
+  if (Number.isFinite(numericId) && numericId > 0) {
+    return `AT-${String(numericId).padStart(4, "0")}`;
+  }
+
+  const emailSeed = String(user?.email || "guest")
+    .replace(/[^a-z0-9]/gi, "")
+    .toUpperCase()
+    .slice(0, 6)
+    .padEnd(6, "X");
+
+  return `AT-${emailSeed}`;
+}
+
+function getMemberSince(user) {
+  const resolvedDate =
+    getValidDateString(user?.createdAt) || getStoredMemberSince(user);
+
+  return formatMemberSince(resolvedDate);
+}
+
+function getStoredMemberSince(user) {
+  const storageKey = buildMemberSinceStorageKey(user);
+  const stored = localStorage.getItem(storageKey);
+  const validStored = getValidDateString(stored);
+
+  if (validStored) {
+    return validStored;
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+  localStorage.setItem(storageKey, today);
+  return today;
+}
+
+function buildMemberSinceStorageKey(user) {
+  const identifier = user?.id || user?.email || "guest";
+  return `academic-tracker-member-since-${identifier}`;
+}
+
+function getValidDateString(value) {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return date.toISOString().split("T")[0];
+}
+
 function formatMemberSince(dateString) {
-  if (!dateString) return "March 2026";
+  if (!dateString) return "Unknown";
 
   const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return "March 2026";
+  if (Number.isNaN(date.getTime())) return "Unknown";
 
   return date.toLocaleDateString("en-US", {
     month: "long",

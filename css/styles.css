@@ -1917,6 +1917,10 @@ main {
   padding: 1rem 0 2.5rem;
 }
 
+.profile-page .nav-links > a:first-child {
+  color: var(--text-primary);
+}
+
 .profile-page .nav-right a[aria-current="page"] {
   color: var(--accent-color);
 }
@@ -1999,19 +2003,28 @@ main {
 
 .appearance-title {
   display: flex;
-  align-items: flex-start;
+  align-items: first baseline;
   gap: 0.65rem;
 }
 
 .appearance-title ion-icon {
+  display: block;
   font-size: 1rem;
-  margin-top: 0.1rem;
+  line-height: 1;
+  margin-top: 0;
   color: var(--accent-color);
 }
+
+.appearance-title > div {
+  display: grid;
+  gap: 0.1rem;
+}
+
 
 .appearance-title h3 {
   font-size: clamp(0.96rem, 0.9rem + 0.25vw, 1.04rem);
   margin-bottom: 0.12rem;
+  transform: translateY(-0.04rem);
 }
 
 .appearance-title p {
