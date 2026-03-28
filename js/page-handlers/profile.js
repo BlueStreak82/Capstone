@@ -28,7 +28,9 @@ function populateProfile(user, grades) {
 function populateStats(user, grades, sessions) {
   const activities = JSON.parse(localStorage.getItem("activities")) || [];
   const calculationCount = activities.filter((item) =>
-    String(item.text || "").toLowerCase().includes("gpa")
+    String(item.text || "")
+      .toLowerCase()
+      .includes("gpa"),
   ).length;
 
   setText("student-id", user?.id || 1);
@@ -36,16 +38,17 @@ function populateStats(user, grades, sessions) {
   setText("courses-tracked", `${grades.length} Courses`);
   setText(
     "gpa-calculations",
-    `${Math.max(calculationCount, grades.length || sessions.length || 0)} Calculations`
+    `${Math.max(calculationCount, grades.length || sessions.length || 0)} Calculations`,
   );
 }
 
 function setupNavigation() {
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", (event) => {
+    logoutBtn.addEventListener("click", async (event) => {
       event.preventDefault();
-      if (confirm("Are you sure you want to logout?")) {
+      const confirmed = await authService.confirmLogout();
+      if (confirmed) {
         authService.logout();
         window.location.href = "index.html";
       }
@@ -62,12 +65,15 @@ function setupAppearanceToggle() {
   if (!toggle) return;
 
   const syncAppearanceState = () => {
-    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    const isDark =
+      document.documentElement.getAttribute("data-theme") === "dark";
     toggle.setAttribute("aria-checked", String(isDark));
     toggle.classList.toggle("is-on", isDark);
 
     if (themeText) {
-      themeText.textContent = isDark ? "Dark mode is enabled" : "Switch to dark mode";
+      themeText.textContent = isDark
+        ? "Dark mode is enabled"
+        : "Switch to dark mode";
     }
 
     if (themeIcon) {
@@ -84,9 +90,11 @@ function setupAppearanceToggle() {
     }
   });
 
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-    requestAnimationFrame(syncAppearanceState);
-  });
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", () => {
+      requestAnimationFrame(syncAppearanceState);
+    });
 
   window.addEventListener("storage", () => {
     requestAnimationFrame(syncAppearanceState);

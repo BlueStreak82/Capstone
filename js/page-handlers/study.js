@@ -43,9 +43,10 @@ async function initStudyPage() {
 function setupNavigation() {
   const logoutBtn = document.getElementById("logout-btn");
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", (event) => {
+    logoutBtn.addEventListener("click", async (event) => {
       event.preventDefault();
-      if (confirm("Are you sure you want to logout?")) {
+      const confirmed = await authService.confirmLogout();
+      if (confirmed) {
         authService.logout();
         window.location.href = "index.html";
       }
@@ -303,7 +304,9 @@ function renderSummary() {
   const inProgress = studyState.readings.filter(
     (item) => item.status === "in-progress",
   ).length;
-  const totalHours = studyTrackerService.calculateTotalHours(studyState.sessions);
+  const totalHours = studyTrackerService.calculateTotalHours(
+    studyState.sessions,
+  );
 
   setText("stat-total-readings", totalReadings);
   setText("stat-completed", completed);
@@ -325,7 +328,8 @@ function renderReadings() {
 
   container.innerHTML = studyState.readings
     .map((item) => {
-      const progress = item.totalPages > 0 ? (item.currentPages / item.totalPages) * 100 : 0;
+      const progress =
+        item.totalPages > 0 ? (item.currentPages / item.totalPages) * 100 : 0;
       const statusLabel = formatStatusLabel(item.status);
       const statusClass = `status-${item.status}`;
 
@@ -393,9 +397,10 @@ function renderSessions() {
   container.innerHTML = sortedSessions
     .slice(0, 6)
     .map((session) => {
-      const mainMaterial = Array.isArray(session.materials) && session.materials.length > 0
-        ? session.materials[0]
-        : "Study session";
+      const mainMaterial =
+        Array.isArray(session.materials) && session.materials.length > 0
+          ? session.materials[0]
+          : "Study session";
       const minutes = Math.round(Number(session.hoursSpent || 0) * 60);
 
       return `
@@ -417,15 +422,23 @@ function renderSessions() {
 }
 
 function renderGoals() {
-  const totalHours = studyTrackerService.calculateTotalHours(studyState.sessions);
+  const totalHours = studyTrackerService.calculateTotalHours(
+    studyState.sessions,
+  );
   const completedReadings = studyState.readings.filter(
     (item) => item.status === "completed",
   ).length;
 
   const hoursProgress = Math.min((totalHours / HOURS_GOAL) * 100, 100);
-  const readingProgress = Math.min((completedReadings / READINGS_GOAL) * 100, 100);
+  const readingProgress = Math.min(
+    (completedReadings / READINGS_GOAL) * 100,
+    100,
+  );
 
-  setText("goal-hours-value", `${formatHours(totalHours)} / ${HOURS_GOAL} hours`);
+  setText(
+    "goal-hours-value",
+    `${formatHours(totalHours)} / ${HOURS_GOAL} hours`,
+  );
   setText(
     "goal-readings-value",
     `${completedReadings} / ${READINGS_GOAL} readings`,
@@ -468,9 +481,10 @@ function createReadingsFromMockData(grades, sessions) {
   const seenTitles = new Set();
 
   sessions.forEach((session, index) => {
-    const title = Array.isArray(session.materials) && session.materials.length > 0
-      ? session.materials[0]
-      : `${session.courseName} Reading`;
+    const title =
+      Array.isArray(session.materials) && session.materials.length > 0
+        ? session.materials[0]
+        : `${session.courseName} Reading`;
 
     if (seenTitles.has(title)) {
       return;
@@ -479,7 +493,10 @@ function createReadingsFromMockData(grades, sessions) {
     seenTitles.add(title);
 
     const estimatedTotal = Math.max(Math.round(session.hoursSpent * 18), 20);
-    const currentPages = Math.min(Math.round(session.hoursSpent * 12), estimatedTotal);
+    const currentPages = Math.min(
+      Math.round(session.hoursSpent * 12),
+      estimatedTotal,
+    );
     const status =
       currentPages === 0
         ? "not-started"
