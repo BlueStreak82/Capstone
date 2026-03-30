@@ -3,11 +3,16 @@ const studyState = {
   grades: [],
   sessions: [],
   readings: [],
+  goals: {
+    hoursGoal: 40,
+    readingsGoal: 5,
+  },
 };
 
-const HOURS_GOAL = 40;
-const READINGS_GOAL = 5;
+const DEFAULT_HOURS_GOAL = 40;
+const DEFAULT_READINGS_GOAL = 5;
 const LEGACY_SEED_CLEAR_FLAG = "academic-tracker-legacy-seed-cleared-v1";
+const USER_WEEKLY_GOALS_KEY_PREFIX = "academic-tracker-weekly-goals-";
 
 document.addEventListener("DOMContentLoaded", initStudyPage);
 
@@ -18,11 +23,13 @@ async function initStudyPage() {
   }
 
   studyState.user = authService.getCurrentUser();
+  studyState.goals = loadWeeklyGoals(studyState.user.id);
 
   setupNavigation();
   setupTabs();
   setupReadingActions();
   setupAddReadingModal();
+  setupWeeklyGoalsSection();
 
   try {
     const [grades, sessions] = await Promise.all([
@@ -217,6 +224,89 @@ function setupAddReadingModal() {
   });
 
   modalForm.addEventListener("submit", handleAddReadingSubmit);
+}
+
+function setupWeeklyGoalsSection() {
+  const goalsForm = document.getElementById("weekly-goals-form");
+  const resetButton = document.getElementById("reset-goals-btn");
+
+  if (!goalsForm) {
+    return;
+  }
+
+  syncGoalsInputs();
+
+  goalsForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    saveWeeklyGoalsFromInputs();
+  });
+
+  resetButton?.addEventListener("click", () => {
+    studyState.goals = {
+      hoursGoal: DEFAULT_HOURS_GOAL,
+      readingsGoal: DEFAULT_READINGS_GOAL,
+    };
+
+    persistWeeklyGoals();
+    syncGoalsInputs();
+    renderGoals();
+    setWeeklyGoalsFeedback("Weekly goals reset to defaults.", "success");
+  });
+}
+
+function saveWeeklyGoalsFromInputs() {
+  const hoursInput = document.getElementById("goal-hours-target-input");
+  const readingsInput = document.getElementById("goal-readings-target-input");
+
+  const hoursGoal = Number(hoursInput?.value);
+  const readingsGoal = Number(readingsInput?.value);
+
+  if (!Number.isFinite(hoursGoal) || hoursGoal < 1 || hoursGoal > 120) {
+    setWeeklyGoalsFeedback("Hours goal must be between 1 and 120.", "error");
+    hoursInput?.focus();
+    return;
+  }
+
+  if (!Number.isFinite(readingsGoal) || readingsGoal < 1 || readingsGoal > 60) {
+    setWeeklyGoalsFeedback("Readings goal must be between 1 and 60.", "error");
+    readingsInput?.focus();
+    return;
+  }
+
+  studyState.goals = {
+    hoursGoal: Math.round(hoursGoal),
+    readingsGoal: Math.round(readingsGoal),
+  };
+
+  persistWeeklyGoals();
+  renderGoals();
+  setWeeklyGoalsFeedback("Weekly goals updated.", "success");
+}
+
+function syncGoalsInputs() {
+  const hoursInput = document.getElementById("goal-hours-target-input");
+  const readingsInput = document.getElementById("goal-readings-target-input");
+
+  if (hoursInput) {
+    hoursInput.value = String(studyState.goals.hoursGoal);
+  }
+
+  if (readingsInput) {
+    readingsInput.value = String(studyState.goals.readingsGoal);
+  }
+}
+
+function setWeeklyGoalsFeedback(message, tone = "") {
+  const feedback = document.getElementById("weekly-goals-feedback");
+  if (!feedback) {
+    return;
+  }
+
+  feedback.textContent = message;
+  feedback.classList.remove("error", "success");
+  if (tone) {
+    feedback.classList.add(tone);
+  }
 }
 
 function openAddReadingModal() {
@@ -514,19 +604,22 @@ function renderGoals() {
     (item) => item.status === "completed",
   ).length;
 
-  const hoursProgress = Math.min((totalHours / HOURS_GOAL) * 100, 100);
+  const hoursGoal = Math.max(Number(studyState.goals.hoursGoal) || 0, 1);
+  const readingsGoal = Math.max(Number(studyState.goals.readingsGoal) || 0, 1);
+
+  const hoursProgress = Math.min((totalHours / hoursGoal) * 100, 100);
   const readingProgress = Math.min(
-    (completedReadings / READINGS_GOAL) * 100,
+    (completedReadings / readingsGoal) * 100,
     100,
   );
 
   setText(
     "goal-hours-value",
-    `${formatHours(totalHours)} / ${HOURS_GOAL} hours`,
+    `${formatHours(totalHours)} / ${hoursGoal} hours`,
   );
   setText(
     "goal-readings-value",
-    `${completedReadings} / ${READINGS_GOAL} readings`,
+    `${completedReadings} / ${readingsGoal} readings`,
   );
 
   const hoursFill = document.getElementById("goal-hours-progress");
@@ -630,6 +723,52 @@ function persistReadings() {
 
 function getReadingsStorageKey(userId) {
   return `academic-tracker-readings-${userId}`;
+}
+
+function loadWeeklyGoals(userId) {
+  const defaults = {
+    hoursGoal: DEFAULT_HOURS_GOAL,
+    readingsGoal: DEFAULT_READINGS_GOAL,
+  };
+
+  try {
+    const raw = localStorage.getItem(getWeeklyGoalsStorageKey(userId));
+    if (!raw) {
+      return defaults;
+    }
+
+    const parsed = JSON.parse(raw);
+    const hoursGoal = Number(parsed?.hoursGoal);
+    const readingsGoal = Number(parsed?.readingsGoal);
+
+    return {
+      hoursGoal:
+        Number.isFinite(hoursGoal) && hoursGoal >= 1 && hoursGoal <= 120
+          ? Math.round(hoursGoal)
+          : DEFAULT_HOURS_GOAL,
+      readingsGoal:
+        Number.isFinite(readingsGoal) && readingsGoal >= 1 && readingsGoal <= 60
+          ? Math.round(readingsGoal)
+          : DEFAULT_READINGS_GOAL,
+    };
+  } catch (error) {
+    return defaults;
+  }
+}
+
+function persistWeeklyGoals() {
+  if (!studyState.user) {
+    return;
+  }
+
+  localStorage.setItem(
+    getWeeklyGoalsStorageKey(studyState.user.id),
+    JSON.stringify(studyState.goals),
+  );
+}
+
+function getWeeklyGoalsStorageKey(userId) {
+  return `${USER_WEEKLY_GOALS_KEY_PREFIX}${userId}`;
 }
 
 function formatStatusLabel(status) {

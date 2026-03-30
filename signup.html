@@ -68,24 +68,46 @@
 
           <div class="form-group">
             <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="At least 6 characters"
-              required
-            />
+            <div class="password-field">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="At least 6 characters"
+                required
+              />
+              <button
+                type="button"
+                id="toggle-signup-password"
+                class="password-toggle"
+                aria-label="Show password"
+                aria-pressed="false"
+              >
+                <ion-icon name="eye-outline" aria-hidden="true"></ion-icon>
+              </button>
+            </div>
           </div>
 
           <div class="form-group">
             <label for="confirm-password">Confirm Password</label>
-            <input
-              type="password"
-              id="confirm-password"
-              name="confirm-password"
-              placeholder="Confirm your password"
-              required
-            />
+            <div class="password-field">
+              <input
+                type="password"
+                id="confirm-password"
+                name="confirm-password"
+                placeholder="Confirm your password"
+                required
+              />
+              <button
+                type="button"
+                id="toggle-signup-confirm-password"
+                class="password-toggle"
+                aria-label="Show password"
+                aria-pressed="false"
+              >
+                <ion-icon name="eye-outline" aria-hidden="true"></ion-icon>
+              </button>
+            </div>
             <div id="password-match" class="password-match"></div>
           </div>
 

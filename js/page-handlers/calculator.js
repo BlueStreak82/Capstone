@@ -27,6 +27,7 @@ async function initCalculatorPage() {
 
   setupNavigation();
   setupCalculatorTypeToggle();
+  clearFeedback();
 
   try {
     const [grades, savedCalculatedCourses] = await Promise.all([
@@ -52,11 +53,9 @@ async function initCalculatorPage() {
       addCourseRow();
       addCourseRow();
     }
-
-    showFeedback("Courses loaded from mock data.", "success");
   } catch (error) {
     addCourseRow();
-    showFeedback("Could not load courses from mock data.", "error");
+    showFeedback("Could not load courses.", "error");
   }
 
   addCourseBtn.addEventListener("click", () => addCourseRow());
@@ -100,11 +99,22 @@ function toggleCreditFields() {
 function addCourseRow(course = {}) {
   const row = document.createElement("div");
   row.className = "calc-course-row";
+  const selectedField =
+    normalizeCourseField(course.field) || inferCourseField(course.name);
 
   row.innerHTML = `
     <label>
       Course
       <input type="text" class="course-name" placeholder="Course name" value="${escapeHtml(course.name || "")}" />
+    </label>
+    <label>
+      Field
+      <input
+        type="text"
+        class="course-field"
+        placeholder="e.g., Engineering, Finance, Psychology"
+        value="${escapeHtml(selectedField)}"
+      />
     </label>
     <label>
       Grade
@@ -147,8 +157,18 @@ function calculateResult() {
   const parsedCourses = rows
     .map((row, index) => {
       const name = row.querySelector(".course-name").value.trim();
+      const typedField = normalizeCourseField(
+        row.querySelector(".course-field")?.value,
+      );
+      const field = typedField || inferCourseField(name);
       const grade = Number(row.querySelector(".course-grade").value);
       const credits = Number(row.querySelector(".course-credit").value);
+
+      if (!field) {
+        return {
+          error: `Course ${index + 1}: enter a field for this course.`,
+        };
+      }
 
       if (!Number.isFinite(grade) || grade < 0 || grade > 100) {
         return {
@@ -164,6 +184,7 @@ function calculateResult() {
 
       return {
         name: name || `Course ${index + 1}`,
+        field,
         grade,
         creditHours: credits,
         semester: getSelectedSemesterLabel(),
@@ -209,9 +230,19 @@ function getSelectedType() {
 }
 
 function showFeedback(message, status) {
+  if (!feedbackEl) {
+    return;
+  }
+
   feedbackEl.textContent = message;
   feedbackEl.classList.remove("error", "success");
-  feedbackEl.classList.add(status);
+  if (status) {
+    feedbackEl.classList.add(status);
+  }
+}
+
+function clearFeedback() {
+  showFeedback("", "");
 }
 
 function logCalculationActivity(type, courseCount, result) {
@@ -396,6 +427,36 @@ function normalizeSemesterTerm(term) {
   }
 
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
+function inferCourseField(courseName) {
+  const name = String(courseName || "").toLowerCase();
+
+  if (name.includes("math")) return "Mathematics";
+  if (
+    name.includes("physics") ||
+    name.includes("chemistry") ||
+    name.includes("biology")
+  ) {
+    return "Science";
+  }
+  if (name.includes("computer") || name.includes("program")) {
+    return "Programming";
+  }
+  if (name.includes("english") || name.includes("literature")) {
+    return "Writing";
+  }
+
+  return "";
+}
+
+function normalizeCourseField(value) {
+  const input = String(value || "").trim();
+  if (!input) {
+    return "";
+  }
+
+  return input.replace(/\s+/g, " ");
 }
 
 function escapeHtml(value) {

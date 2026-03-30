@@ -461,6 +461,18 @@
   font-size: 1.1rem;
 }
 
+.empty-activity {
+  margin: 0;
+  padding: 0.9rem;
+  border: 1px dashed var(--border-color);
+  border-radius: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.loading-activity {
+  opacity: 0.8;
+}
+
 /* Tablet view */
 @media screen and (min-width: 768px) {
   .nav {

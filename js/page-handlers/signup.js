@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!signupForm) return;
 
+  setupPasswordToggle("toggle-signup-password", "password");
+  setupPasswordToggle("toggle-signup-confirm-password", "confirm-password");
+
   signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -100,6 +103,38 @@ document.addEventListener("DOMContentLoaded", () => {
   function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  }
+
+  function setupPasswordToggle(toggleId, inputId) {
+    const toggleButton = document.getElementById(toggleId);
+    const input = document.getElementById(inputId);
+    const icon = toggleButton?.querySelector("ion-icon");
+
+    if (!toggleButton || !input) {
+      return;
+    }
+
+    const setVisible = (isVisible) => {
+      input.type = isVisible ? "text" : "password";
+      toggleButton.setAttribute("aria-pressed", String(isVisible));
+      toggleButton.setAttribute(
+        "aria-label",
+        isVisible ? "Hide password" : "Show password",
+      );
+
+      if (icon) {
+        icon.setAttribute(
+          "name",
+          isVisible ? "eye-off-outline" : "eye-outline",
+        );
+      }
+    };
+
+    setVisible(false);
+
+    toggleButton.addEventListener("click", () => {
+      setVisible(input.type === "password");
+    });
   }
 
   // Real-time password match validation

@@ -2,6 +2,8 @@ let performanceState = {
   user: null,
   grades: [],
   calcMode: "gpa",
+  selectedCourseSemester: "",
+  selectedSkillsSemester: "",
 };
 
 const USER_CALC_PREF_KEY_PREFIX = "academic-tracker-calc-pref-";
@@ -22,7 +24,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         ? mergeCourseSources(grades, calculatedCourses)
         : grades;
     const calcMode = getUserCalculationMode(user.id);
-    performanceState = { user, grades: effectiveGrades, calcMode };
+    performanceState = {
+      user,
+      grades: effectiveGrades,
+      calcMode,
+      selectedCourseSemester: "",
+      selectedSkillsSemester: "",
+    };
 
     initializeTabs();
     setupNavigation();
@@ -92,6 +100,21 @@ function initializeTabs() {
 function renderPerformanceView(user, grades, calcMode = "gpa") {
   const normalizedGrades = normalizeGrades(grades, calcMode);
   const semesterPoints = buildSemesterTrend(normalizedGrades, calcMode);
+  const semesters = getAvailableSemesters(normalizedGrades);
+  const selectedCourseSemester = ensureSelectedSemester(
+    "selectedCourseSemester",
+    semesters,
+  );
+  const selectedSkillsSemester = ensureSelectedSemester(
+    "selectedSkillsSemester",
+    semesters,
+  );
+  const selectedCourseGrades = normalizedGrades.filter(
+    (course) => getCourseSemester(course) === selectedCourseSemester,
+  );
+  const selectedSkillsGrades = normalizedGrades.filter(
+    (course) => getCourseSemester(course) === selectedSkillsSemester,
+  );
   const focusThreshold = calcMode === "cwa" ? 75 : 3.3;
   const topCourses = [...normalizedGrades]
     .sort((a, b) => b.gradePoint - a.gradePoint)
@@ -105,8 +128,52 @@ function renderPerformanceView(user, grades, calcMode = "gpa") {
   renderCourseList("top-courses-list", topCourses, "good", calcMode);
   renderCourseList("focus-courses-list", focusCourses, "warn", calcMode);
   renderTrendChart("trend-chart", semesterPoints, calcMode);
-  renderCourseChart("course-chart", normalizedGrades, calcMode);
-  renderSkillsChart("skills-chart", buildSkillData(user, normalizedGrades));
+  renderSemesterSelector(
+    "course-semester-filter",
+    semesters,
+    selectedCourseSemester,
+    (semester) => {
+      if (semester === performanceState.selectedCourseSemester) {
+        return;
+      }
+
+      performanceState.selectedCourseSemester = semester;
+      renderPerformanceView(
+        performanceState.user,
+        performanceState.grades,
+        performanceState.calcMode,
+      );
+    },
+  );
+  renderSemesterSelector(
+    "skills-semester-filter",
+    semesters,
+    selectedSkillsSemester,
+    (semester) => {
+      if (semester === performanceState.selectedSkillsSemester) {
+        return;
+      }
+
+      performanceState.selectedSkillsSemester = semester;
+      renderPerformanceView(
+        performanceState.user,
+        performanceState.grades,
+        performanceState.calcMode,
+      );
+    },
+  );
+  updatePanelDescription(
+    "course-panel-description",
+    "Compare your grades across different courses",
+    selectedCourseSemester,
+  );
+  updatePanelDescription(
+    "skills-panel-description",
+    "Visual representation of your strengths across different areas",
+    selectedSkillsSemester,
+  );
+  renderCourseChart("course-chart", selectedCourseGrades, calcMode);
+  renderSkillsChart("skills-chart", buildSkillData(selectedSkillsGrades));
   renderRecommendations(
     normalizedGrades,
     semesterPoints,
@@ -171,6 +238,91 @@ function buildSemesterTrend(grades, calcMode = "gpa") {
             })),
           ),
   }));
+}
+
+function getAvailableSemesters(grades) {
+  return Array.from(
+    new Set(grades.map((course) => getCourseSemester(course))),
+  ).sort((left, right) => compareSemesters(left, right));
+}
+
+function getCourseSemester(course) {
+  return String(course?.semester || "Unspecified");
+}
+
+function ensureSelectedSemester(stateKey, semesters) {
+  if (semesters.length === 0) {
+    performanceState[stateKey] = "";
+    return "";
+  }
+
+  const selected = performanceState[stateKey];
+  if (selected && semesters.includes(selected)) {
+    return selected;
+  }
+
+  const latestSemester = semesters[semesters.length - 1];
+  performanceState[stateKey] = latestSemester;
+  return latestSemester;
+}
+
+function renderSemesterSelector(
+  targetId,
+  semesters,
+  selectedSemester,
+  onSelect,
+) {
+  const container = document.getElementById(targetId);
+  if (!container) return;
+
+  if (semesters.length === 0) {
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="panel-filter-list" role="tablist" aria-label="Semester selector">
+      ${semesters
+        .map(
+          (semester, index) => `
+            <button
+              type="button"
+              role="tab"
+              class="panel-filter-button${semester === selectedSemester ? " active" : ""}"
+              aria-selected="${semester === selectedSemester}"
+              data-index="${index}"
+            >
+              ${formatSemesterLabel(semester, index)}
+            </button>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+
+  container.querySelectorAll(".panel-filter-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.index);
+      const semester = semesters[index];
+      if (!semester) {
+        return;
+      }
+
+      onSelect(semester);
+    });
+  });
+}
+
+function updatePanelDescription(targetId, baseText, selectedSemester) {
+  const element = document.getElementById(targetId);
+  if (!element) return;
+
+  if (!selectedSemester) {
+    element.textContent = baseText;
+    return;
+  }
+
+  element.textContent = `${baseText} (${selectedSemester})`;
 }
 
 function updateMetrics(grades, semesterPoints, calcMode = "gpa") {
@@ -268,8 +420,8 @@ function renderTrendChart(targetId, points, calcMode = "gpa") {
   const compact = width < 460;
   const height = compact ? 190 : width < 620 ? 215 : 235;
   const padding = compact
-    ? { top: 16, right: 12, bottom: 30, left: 28 }
-    : { top: 18, right: 18, bottom: 34, left: 36 };
+    ? { top: 16, right: 20, bottom: 30, left: 28 }
+    : { top: 18, right: 28, bottom: 34, left: 36 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
 
@@ -297,13 +449,28 @@ function renderTrendChart(targetId, points, calcMode = "gpa") {
     .join("");
 
   const verticalLines = coords
-    .map(
-      (point) =>
-        `<line x1="${point.x}" y1="${padding.top}" x2="${point.x}" y2="${
-          height - padding.bottom
-        }" class="chart-grid-line chart-grid-line-vertical" />
-         <text x="${point.x}" y="${height - 12}" text-anchor="middle" class="chart-axis-label">${compact ? `S${point.label.replace("Sem ", "")}` : point.label}</text>`,
-    )
+    .map((point, index) => {
+      const lastIndex = coords.length - 1;
+      let textAnchor = "middle";
+      let labelX = point.x;
+
+      if (index === 0) {
+        textAnchor = "start";
+        labelX = point.x + 3;
+      } else if (index === lastIndex) {
+        textAnchor = "end";
+        labelX = point.x - 3;
+      }
+
+      const label = compact
+        ? `S${point.label.replace("Sem ", "")}`
+        : point.label;
+
+      return `<line x1="${point.x}" y1="${padding.top}" x2="${point.x}" y2="${
+        height - padding.bottom
+      }" class="chart-grid-line chart-grid-line-vertical" />
+         <text x="${labelX}" y="${height - 12}" text-anchor="${textAnchor}" class="chart-axis-label">${label}</text>`;
+    })
     .join("");
 
   const pointsMarkup = coords
@@ -348,18 +515,21 @@ function renderCourseChart(targetId, courses, calcMode = "gpa") {
       : { top: 18, right: 42, bottom: 60, left: 44 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
+  const leadingOffset = compact ? 12 : 16;
+  const usableChartWidth = Math.max(0, chartWidth - leadingOffset);
   const barWidth = Math.min(
     76,
-    chartWidth / Math.max(courses.length * 1.08, 1),
+    usableChartWidth / Math.max(courses.length * 1.08, 1),
   );
   const gap = Math.max(
     18,
-    (chartWidth - barWidth * courses.length) / Math.max(courses.length - 1, 1),
+    (usableChartWidth - barWidth * courses.length) /
+      Math.max(courses.length - 1, 1),
   );
 
   const bars = courses
     .map((course, index) => {
-      const x = padding.left + index * (barWidth + gap);
+      const x = padding.left + leadingOffset + index * (barWidth + gap);
       const maxValue = calcMode === "cwa" ? 100 : 4;
       const barHeight = (course.gradePoint / maxValue) * chartHeight;
       const y = padding.top + chartHeight - barHeight;
@@ -441,7 +611,7 @@ function renderSkillsChart(targetId, skills) {
 
   if (skills.length === 0) {
     container.innerHTML =
-      '<div class="empty-state">No skill data available yet.</div>';
+      '<div class="empty-state">No field data available yet. Add course fields in the calculator to populate this chart.</div>';
     return;
   }
 
@@ -512,30 +682,59 @@ function getRadarSize(container) {
   return 520;
 }
 
-function buildSkillData(user, grades) {
-  const baseSkills = [
-    { label: "Mathematics", value: 62 },
-    { label: "Science", value: 58 },
-    { label: "Programming", value: 72 },
-    { label: "Writing", value: 60 },
-    { label: "Analysis", value: 66 },
-    { label: "Problem Solving", value: 70 },
-  ];
-
-  grades.forEach((course) => {
-    const mappedSkill = mapCourseToSkill(course.name);
-    const skill = baseSkills.find((item) => item.label === mappedSkill);
-    if (skill) {
-      skill.value = Math.min(95, Math.round((skill.value + course.grade) / 2));
-    }
-  });
-
-  if (user?.name?.toLowerCase().includes("demo")) {
-    baseSkills[2].value += 6;
-    baseSkills[5].value += 4;
+function buildSkillData(grades) {
+  if (!Array.isArray(grades) || grades.length === 0) {
+    return [];
   }
 
-  return baseSkills;
+  const fieldBuckets = new Map();
+
+  grades.forEach((course) => {
+    const score = Number(course.grade);
+    const fieldLabel = normalizeFieldLabel(course.field);
+
+    if (!Number.isFinite(score)) {
+      return;
+    }
+
+    if (!fieldLabel) {
+      return;
+    }
+
+    const key = fieldLabel.toLowerCase();
+    if (!fieldBuckets.has(key)) {
+      fieldBuckets.set(key, {
+        label: fieldLabel,
+        total: 0,
+        count: 0,
+      });
+    }
+
+    const bucket = fieldBuckets.get(key);
+    bucket.total += score;
+    bucket.count += 1;
+  });
+
+  return Array.from(fieldBuckets.values())
+    .sort((left, right) => left.label.localeCompare(right.label))
+    .map((bucket) => ({
+      label: bucket.label,
+      value: Math.max(
+        0,
+        Math.min(100, Math.round(bucket.total / bucket.count)),
+      ),
+    }));
+}
+
+function normalizeFieldLabel(field) {
+  const normalized = String(field || "")
+    .trim()
+    .replace(/\s+/g, " ");
+  if (!normalized) {
+    return "";
+  }
+
+  return normalized;
 }
 
 function renderRecommendations(
@@ -809,17 +1008,6 @@ function normalizeSemesterTerm(term) {
   }
 
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
-}
-
-function mapCourseToSkill(courseName) {
-  const name = courseName.toLowerCase();
-
-  if (name.includes("math")) return "Mathematics";
-  if (name.includes("physics") || name.includes("chemistry")) return "Science";
-  if (name.includes("computer") || name.includes("program"))
-    return "Programming";
-  if (name.includes("english") || name.includes("literature")) return "Writing";
-  return "Analysis";
 }
 
 function setText(id, value) {
