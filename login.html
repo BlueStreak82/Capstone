@@ -57,13 +57,24 @@
 
           <div class="form-group">
             <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Enter your password"
-              required
-            />
+            <div class="password-field">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+              />
+              <button
+                type="button"
+                id="toggle-login-password"
+                class="password-toggle"
+                aria-label="Show password"
+                aria-pressed="false"
+              >
+                <ion-icon name="eye-outline" aria-hidden="true"></ion-icon>
+              </button>
+            </div>
           </div>
 
           <button type="submit" class="login-button">Sign In</button>

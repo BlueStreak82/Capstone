@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!loginForm) return;
 
+  setupPasswordToggle("toggle-login-password", "password");
+
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -71,6 +73,38 @@ document.addEventListener("DOMContentLoaded", () => {
   function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  }
+
+  function setupPasswordToggle(toggleId, inputId) {
+    const toggleButton = document.getElementById(toggleId);
+    const input = document.getElementById(inputId);
+    const icon = toggleButton?.querySelector("ion-icon");
+
+    if (!toggleButton || !input) {
+      return;
+    }
+
+    const setVisible = (isVisible) => {
+      input.type = isVisible ? "text" : "password";
+      toggleButton.setAttribute("aria-pressed", String(isVisible));
+      toggleButton.setAttribute(
+        "aria-label",
+        isVisible ? "Hide password" : "Show password",
+      );
+
+      if (icon) {
+        icon.setAttribute(
+          "name",
+          isVisible ? "eye-off-outline" : "eye-outline",
+        );
+      }
+    };
+
+    setVisible(false);
+
+    toggleButton.addEventListener("click", () => {
+      setVisible(input.type === "password");
+    });
   }
 
   // Demo credentials helper

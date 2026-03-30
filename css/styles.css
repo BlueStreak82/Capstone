@@ -474,6 +474,45 @@ main {
     box-shadow 0.3s ease;
 }
 
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: var(--text-primary);
+  background: var(--hover-bg);
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 1px;
+}
+
+.password-toggle ion-icon {
+  font-size: 18px;
+}
+
 .form-group input:focus {
   outline: none;
   border-color: var(--accent-color);
@@ -839,7 +878,21 @@ main {
   background: var(--bg-primary);
 }
 
+.calc-course-row select {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 0.6rem;
+  padding: 0.62rem 0.7rem;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
 .calc-course-row input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.calc-course-row select:focus {
   outline: none;
   border-color: var(--accent-color);
 }
@@ -937,7 +990,7 @@ main {
 
   .calc-course-row {
     grid-template-columns:
-      minmax(200px, 1.4fr) repeat(2, minmax(110px, 0.7fr))
+      minmax(180px, 1.2fr) minmax(140px, 1fr) repeat(2, minmax(104px, 0.65fr))
       auto;
     align-items: end;
   }
@@ -1061,6 +1114,53 @@ main {
 
 .tab-panels {
   margin-top: 1rem;
+}
+
+.panel-filter-row {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.panel-filter-label {
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.panel-filter {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.1rem;
+}
+
+.panel-filter-list {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-secondary);
+  padding: 0.2rem;
+  min-width: max-content;
+}
+
+.panel-filter-button {
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 0.34rem 0.68rem;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.panel-filter-button.active {
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .chart-card,
@@ -1362,6 +1462,12 @@ main {
 
   .performance-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .panel-filter-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
   }
 
   .chart-card,
@@ -1715,6 +1821,56 @@ main {
   margin-top: 0.85rem;
 }
 
+.goal-config-form {
+  margin-top: 0.25rem;
+}
+
+.goal-config-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+
+.goal-config-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.goal-config-field span {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.goal-config-field input {
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 0.55rem;
+  padding: 0.58rem 0.65rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.goal-config-field input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.goal-config-actions {
+  margin-top: 0.65rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.goal-config-actions .btn-primary,
+.goal-config-actions .btn-secondary {
+  height: 2rem;
+  font-size: 0.8rem;
+  border-radius: 0.5rem;
+}
+
 .goal-label {
   margin-bottom: 0.4rem;
   display: flex;
@@ -1941,6 +2097,10 @@ main {
   .study-form-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .goal-config-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 64rem) {
@@ -2065,7 +2225,6 @@ main {
   display: grid;
   gap: 0.1rem;
 }
-
 
 .appearance-title h3 {
   font-size: clamp(0.96rem, 0.9rem + 0.25vw, 1.04rem);

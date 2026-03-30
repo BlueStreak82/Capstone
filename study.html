@@ -49,9 +49,9 @@
 
         <div class="nav-right">
           <a href="profile.html" id="profile">
-              <ion-icon name="person-outline" class="nav-icon"></ion-icon>
-              Profile
-            </a>
+            <ion-icon name="person-outline" class="nav-icon"></ion-icon>
+            Profile
+          </a>
 
           <button
             id="theme-toggle"
@@ -164,6 +164,45 @@
         <p class="section-subtext">
           Track your progress towards weekly targets
         </p>
+
+        <form id="weekly-goals-form" class="goal-config-form">
+          <div class="goal-config-grid">
+            <label class="goal-config-field" for="goal-hours-target-input">
+              <span>Study Hours Target</span>
+              <input
+                id="goal-hours-target-input"
+                type="number"
+                min="1"
+                max="120"
+                step="1"
+                required
+              />
+            </label>
+
+            <label class="goal-config-field" for="goal-readings-target-input">
+              <span>Completed Readings Target</span>
+              <input
+                id="goal-readings-target-input"
+                type="number"
+                min="1"
+                max="60"
+                step="1"
+                required
+              />
+            </label>
+          </div>
+
+          <div class="goal-config-actions">
+            <button id="save-goals-btn" class="btn-primary" type="submit">
+              Save Goals
+            </button>
+            <button id="reset-goals-btn" class="btn-secondary" type="button">
+              Reset Defaults
+            </button>
+          </div>
+
+          <p id="weekly-goals-feedback" class="study-form-feedback"></p>
+        </form>
 
         <div class="goal-row">
           <div class="goal-label">

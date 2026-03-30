@@ -78,10 +78,8 @@
     <main class="container">
       <!-- USER -->
       <section class="address">
-        <h1>Welcome back, <span id="user-name">Student</span> 👋</h1>
-        <p id="user-email">
-          Track your academic progress and achieve your goals
-        </p>
+        <h1>Welcome back, <span id="user-name">--</span> 👋</h1>
+        <p id="user-email">Loading profile...</p>
       </section>
 
       <!-- TOP CARDS -->
@@ -92,8 +90,8 @@
             class="card-icon icon-blue"
           ></ion-icon>
           <h4 id="current-metric-label">Current GPA</h4>
-          <h2 id="gpa-value">3.45</h2>
-          <p id="current-metric-note">Latest calculated value</p>
+          <h2 id="gpa-value">--</h2>
+          <p id="current-metric-note">Loading...</p>
         </div>
 
         <div class="dashboard-card gradient-purple">
@@ -102,14 +100,14 @@
             class="card-icon icon-purple"
           ></ion-icon>
           <h4>Study Hours</h4>
-          <h2 id="total-hours">42h</h2>
+          <h2 id="total-hours">--</h2>
           <p>This week</p>
         </div>
 
         <div class="dashboard-card gradient-green">
           <ion-icon name="flag-outline" class="card-icon icon-green"></ion-icon>
           <h4>Goals Achieved</h4>
-          <h2 id="sessions-count">7/10</h2>
+          <h2 id="sessions-count">--</h2>
           <p>This month</p>
         </div>
       </section>
@@ -169,35 +167,9 @@
         </div>
 
         <div class="activity-list">
-          <div class="activity-item">
-            <div class="activity-icon icon-blue blue">
-              <ion-icon name="calculator-outline"></ion-icon>
-            </div>
-            <div>
-              <p>Calculated GPA for Semester 2</p>
-              <span>2 hours ago</span>
-            </div>
-          </div>
-
-          <div class="activity-item">
-            <div class="activity-icon icon-green green">
-              <ion-icon name="book-outline"></ion-icon>
-            </div>
-            <div>
-              <p>Completed reading: Data Structures Chapter 5</p>
-              <span>5 hours ago</span>
-            </div>
-          </div>
-
-          <div class="activity-item">
-            <div class="activity-icon icon-purple purple">
-              <ion-icon name="analytics-outline"></ion-icon>
-            </div>
-            <div>
-              <p>Viewed performance report</p>
-              <span>1 day ago</span>
-            </div>
-          </div>
+          <p class="empty-activity loading-activity">
+            Loading recent activity...
+          </p>
         </div>
       </section>
     </main>
