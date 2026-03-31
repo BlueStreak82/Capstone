@@ -54,6 +54,7 @@
     "Helvetica Neue", Arial, sans-serif;
   --font-size-base: 14px;
   --line-height-base: 1.6;
+  --index-nav-height: clamp(3.5rem, 6vh, 4.25rem);
 }
 
 /* Dark Mode Colors */
@@ -108,6 +109,8 @@ html {
   scroll-behavior: smooth;
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 body {
@@ -115,15 +118,12 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: var(--line-height-base);
-  overflow-x: hidden;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
 }
 
-body::-webkit-scrollbar {
+html::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
@@ -143,10 +143,13 @@ main {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  height: 6vh;
+  min-height: var(--index-nav-height);
+  height: var(--index-nav-height);
+  width: 100%;
   border-bottom: 1px solid var(--nav-border);
   padding: 0.875rem 1rem;
   background-color: var(--nav-bg);
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -177,6 +180,7 @@ main {
 
 .index-nav-right {
   display: flex;
+  align-items: center;
 }
 
 .index-nav-links {
@@ -188,7 +192,9 @@ main {
 }
 
 .index-nav-links a {
-  position: fixed;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   color: var(--text-primary);
   text-decoration: none;
   font-weight: 500;
@@ -218,7 +224,7 @@ main {
 }
 
 .hero h1 {
-  font-size: clamp(32px, 10vw, 42px);
+  font-size: clamp(28px, 7vw, 38px);
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 18px;
@@ -234,7 +240,7 @@ main {
 }
 
 .footer h1 {
-  font-size: clamp(25px, 6vw, 35px);
+  font-size: clamp(22px, 5.5vw, 32px);
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 18px;
@@ -244,8 +250,8 @@ main {
 .hero p,
 .footer p {
   color: var(--text-secondary);
-  font-size: clamp(14px, 4vw, 20px);
-  max-width: clamp(280px, 50vw, 1000px);
+  font-size: clamp(14px, 3.2vw, 18px);
+  max-width: clamp(280px, 68vw, 760px);
   margin: 0 auto 20px;
   text-align: center;
 }
@@ -314,7 +320,7 @@ main {
 }
 
 .features-header h2 {
-  font-size: clamp(18px, 5vw, 25px);
+  font-size: clamp(18px, 4vw, 24px);
   font-weight: 700;
   line-height: 1.25;
   color: var(--text-primary);
@@ -345,7 +351,7 @@ main {
 }
 
 .card h3 {
-  font-size: clamp(15px, 5vw, 20px);
+  font-size: clamp(15px, 3.2vw, 18px);
   font-weight: 700;
   margin-bottom: 6px;
   color: var(--text-primary);
@@ -432,7 +438,9 @@ main {
 /* Start of login page */
 
 .login-container {
-  min-height: 94vh;
+  min-height: calc(100vh - var(--index-nav-height));
+  min-height: calc(100svh - var(--index-nav-height));
+  min-height: calc(100dvh - var(--index-nav-height));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -597,7 +605,9 @@ main {
    ========================================== */
 
 .signup-container {
-  min-height: 94vh;
+  min-height: calc(100vh - var(--index-nav-height));
+  min-height: calc(100svh - var(--index-nav-height));
+  min-height: calc(100dvh - var(--index-nav-height));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -719,7 +729,7 @@ main {
   .cards {
     display: flex;
     flex-direction: row;
-    gap: clamp(6px, 10vw, 20px);
+    gap: clamp(8px, 3vw, 14px);
   }
 }
 
@@ -757,7 +767,7 @@ main {
 }
 
 .calculator-header h1 {
-  font-size: clamp(1.6rem, 5vw, 2rem);
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
   line-height: 1.15;
 }
 
@@ -970,7 +980,7 @@ main {
 }
 
 .calculator-result-card h2 {
-  font-size: clamp(1.9rem, 8vw, 2.5rem);
+  font-size: clamp(1.7rem, 6vw, 2.2rem);
   line-height: 1.1;
 }
 
@@ -1043,7 +1053,7 @@ main {
 }
 
 .performance-hero h1 {
-  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  font-size: clamp(1.65rem, 5.5vw, 2.2rem);
   line-height: 1.15;
 }
 
@@ -1074,7 +1084,7 @@ main {
 
 .metric-card h2 {
   margin-top: 0.25rem;
-  font-size: clamp(1.7rem, 7vw, 2.1rem);
+  font-size: clamp(1.5rem, 5vw, 1.9rem);
   line-height: 1.1;
 }
 
@@ -1559,7 +1569,7 @@ main {
 }
 
 .study-header h1 {
-  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  font-size: clamp(1.65rem, 5.5vw, 2.2rem);
   line-height: 1.15;
 }
 
@@ -2150,7 +2160,7 @@ main {
 }
 
 .profile-hero h1 {
-  font-size: clamp(2rem, 1.7rem + 1.3vw, 2.6rem);
+  font-size: clamp(1.8rem, 1.55rem + 1.1vw, 2.3rem);
   line-height: 1.08;
   margin-bottom: 0.35rem;
 }
